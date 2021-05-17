@@ -1,4 +1,4 @@
-
+from tkinter import INSERT
 
 import requests
 import execjs
@@ -113,39 +113,44 @@ class Trans_GUI:
 
         #修改标题与窗口大小
         self.main_window.title('翻译')
-        self.main_window.geometry('800x300')
+        self.main_window.geometry('1000x400')
 
         #创建三个frame模块
         # self.top_frame = tkinter.Frame(self.main_window)
-        self.mid_f_frame = tkinter.Frame(self.main_window)
-        self.mid_r_frame = tkinter.Frame(self.main_window)
-        self.button_frame = tkinter.Frame(self.main_window)
+        self.mid_f_frame = tkinter.Frame(self.main_window) #放输入文本
+        self.mid_r_frame = tkinter.Frame(self.main_window) #显示翻译后文本，左右放置
+        # self.button_frame = tkinter.Frame(self.main_window)
 
         #定义提示输入标签
         self.show_label = tkinter.Label(self.mid_f_frame,text = '翻译内容（中文）',bg = 'green',font = ('Arial',12),width = 20 ,height = 1)
 
         #定义用于显示结果的标签
         # self.mid_label = tkinter.Label(self.mid_r_frame,text =' 百度翻译结果：')
-        self.m1 = tkinter.Message(self.mid_r_frame, text='百度翻译结果：')
+        self.m1 = tkinter.Label(self.mid_r_frame, text='百度翻译结果：')   #使用Message，可以自动换行，用于显示多行文本
 
         #使用StringVar创建一个对象
-        self.value = tkinter.StringVar()
+        # self.value = tkinter.StringVar()
 
         #定义一个标签来接收计算后结果
-        self.K_label = tkinter.Message(self.mid_r_frame,textvariable = self.value)
+        # self.K_label = tkinter.Message(self.mid_r_frame,textvariable = self.value)
+        self.K_label = tkinter.Text(self.mid_r_frame,width=70,height=15,wrap='word')
+
+        # self.K_label['state'] = 'disabled'
 
         #定义输入窗格
-        self.input_window = tkinter.Text(self.mid_f_frame,width=40,height=15)
+        self.input_window = tkinter.Text(self.mid_f_frame,width=70,height=15)   #使用Text函数，可以自动换行，用于输入多行文本
         # self.input_window.place(x=50,y=20,width=40,height = 10)
 
         #定义按钮
-        self.calc_button = tkinter.Button(self.button_frame,text = 'Convert',command = self.calculate,width = 10)
-        self.quit_button = tkinter.Button(self.button_frame,text = 'quit',command = self.main_window.destroy,width = 10,bg= 'red')
+        self.calc_button = tkinter.Button(self.main_window,text = 'Convert',command = self.calculate,width = 10)
+        self.quit_button = tkinter.Button(self.main_window,text = 'quit',command = self.main_window.destroy,width = 10,bg= 'red')
 
 
         #放置按钮
-        self.calc_button.pack(side = 'left')
-        self.quit_button.pack(side = 'right')
+        # self.calc_button.pack(side = 'left')
+        self.calc_button.place(x=200,y=350,width=100)
+        # self.quit_button.pack(side = 'right')
+        self.quit_button.place(x=600,y=350,width=100)
 
         #放置输入窗格与提示标签
         self.show_label.pack(side = 'top')
@@ -153,15 +158,15 @@ class Trans_GUI:
 
         #放置中间显示结果的标签
         # self.mid_label.pack(side='left')
-        self.m1.pack(side='left')
-        self.K_label.pack(side = 'left')
+        self.m1.pack(side='top')
+        self.K_label.pack(side = 'top')
 
 
         #放置frame
         # self.top_frame.pack(side = 'top')
         self.mid_f_frame.pack(side = 'left')
-        self.mid_r_frame.pack(side = 'left')
-        self.button_frame.pack(side = 'bottom')
+        self.mid_r_frame.pack(side = 'right')
+        # self.button_frame.pack(side = 'bottom')
 
         tkinter.mainloop()
 
@@ -173,7 +178,8 @@ class Trans_GUI:
 
         # T = t + 273.15
 
-        self.value.set(trans)
+        self.K_label.insert(INSERT,trans)
+        # self.value.set(trans)
         # self.value =T   #必须用set函数赋值
 
         # tkinter.messagebox.showinfo('Response', f'{t}摄氏度是{T}开尔文')  # 显示信息 surprise
