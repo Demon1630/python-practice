@@ -6,7 +6,7 @@ from fake_useragent import UserAgent
 
 #定义翻译函数
 class Translate:
-    def get_result(self,to_trans):
+    def get_result(self,to_trans,From,To):
         self.headers = {'Connection': 'keep-alive',
                         'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
                         'Cookie': 'BAIDUID=779675DE60B7773D2B5ABC77906B7546:FG=1; BAIDUID_BFESS=779675DE60B7773D2B5ABC77906B7546:FG=1; BIDUPSID=779675DE60B7773D2B5ABC77906B7546; PSTM=1615268644; BDUSS=ld3RkJWaWt-UDFUSURtYzVoS1pYU1QtdWgyWDh3TWFWVXYxMnd5dEZsTHNoWDlnSVFBQUFBJCQAAAAAAAAAAAEAAADSm7VOZmZqZmdmZ2trAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAOz4V2Ds-FdgU; BDUSS_BFESS=ld3RkJWaWt-UDFUSURtYzVoS1pYU1QtdWgyWDh3TWFWVXYxMnd5dEZsTHNoWDlnSVFBQUFBJCQAAAAAAAAAAAEAAADSm7VOZmZqZmdmZ2trAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAOz4V2Ds-FdgU; __yjs_duid=1_dce50a1623bd207e0ed2c3170cf11d471620617963740; REALTIME_TRANS_SWITCH=1; FANYI_WORD_SWITCH=1; HISTORY_SWITCH=1; SOUND_SPD_SWITCH=1; SOUND_PREFER_SWITCH=1; Hm_lvt_64ecd82404c51e03dc91cb9e8c025574=1621089807,1621158773; Hm_lpvt_64ecd82404c51e03dc91cb9e8c025574=1621158773; __yjs_st=2_MDZmZWQyODMyOTAwMTk0NWVmYjQ2ZjVhNmU5MGJiOTlkMmNlMTdiNGFjMWMxNjg0YTdiYWU5ZjZmOGViYjU5NjY0ZWE4ODgzOTE4ZjY4MDE2OGJjMWU2ODRjYzZiMTBkOTlkZWZiOGM3MjBlZDA2YzRlNDNlZjhiNzVlOWI4NzQzNDBiYWNiOGQ2YjhkNjQ3YzljMmNmYTYxNWI3OWQ1OWIwOGFjOTFiNzExY2UxZjdjMDJmN2U3NmY4YTc1YzM2OGEyZTQ0ZmYzNGU4ZjIxNDI2NDQ1ODJkOWMyN2ZiNTZjZDkwNTc2NzliYzJjZDRkNzhjMDRlYjExMmEyMmQxYV83XzYzZDBiY2E4',
@@ -80,8 +80,8 @@ class Translate:
 
         self.url = 'https://fanyi.baidu.com/v2transapi'
 
-        self.From = 'zh'
-        self.To = 'en'
+        self.From = From
+        self.To = To
         self.token= '1cd6523421d1875e890a2aed45029ce2'
         self.q = to_trans
 
@@ -114,7 +114,7 @@ class Trans_GUI:
         self.mid_r_frame = tkinter.Frame(self.main_window) #显示翻译后文本，左右放置
 
         #定义提示输入标签
-        self.show_label = tkinter.Label(self.mid_f_frame,text = '翻译内容（中文）',bg = 'green')
+        self.show_label = tkinter.Label(self.mid_f_frame,text = '待翻译内容',bg = 'green')
 
         #定义用于显示结果的标签
         self.m1 = tkinter.Label(self.mid_r_frame, text='百度翻译结果：')
@@ -127,13 +127,16 @@ class Trans_GUI:
         self.input_window = tkinter.Text(self.mid_f_frame,width=70,height=20)   #使用Text函数，可以自动换行，用于输入多行文本
 
         #定义按钮
-        self.calc_button = tkinter.Button(self.main_window,text = 'Convert',command = self.calculate,width = 10)
-        self.quit_button = tkinter.Button(self.main_window,text = 'quit',command = self.main_window.destroy,width = 10,bg= 'red')
-
+        # self.calc_button = tkinter.Button(self.main_window,text = 'Convert',command = self.calculate,width = 10)
+        self.quit_button = tkinter.Button(self.main_window,text = 'quit',command = self.main_window.destroy,width = 10,bg= 'red')  #退出窗口
+        self.zh_en_button = tkinter.Button(self.main_window,text = '中——》英',command = self.zh_en,width = 10) # 中文转英文
+        self.en_zh_button = tkinter.Button(self.main_window,text='英——》中',command = self.en_zh,width = 10)  #英文转中文
 
         #放置按钮
-        self.calc_button.place(x=200,y=365,width=100)   #使用place放置，采用绝对位置，但必须放置在主窗格中，不能放到frame，因为frame大小不固定
-        self.quit_button.place(x=700,y=365,width=100)
+        # self.calc_button.place(x=200,y=365,width=100)   #使用place放置，采用绝对位置，但必须放置在主窗格中，不能放到frame，因为frame大小不固定
+        self.quit_button.place(x=800,y=365,width=100)
+        self.zh_en_button.place(x=200,y=365,width=100)
+        self.en_zh_button.place(x=500,y=365,width=100)
 
         #放置输入窗格与提示标签
         self.show_label.pack(side = 'top')
@@ -150,15 +153,30 @@ class Trans_GUI:
 
         tkinter.mainloop()
 
-        #定义转换函数
-    def calculate(self):
+    def zh_en(self):
+        self.From = 'zh'
+        self.To = 'en'
         t = self.input_window.get(0.0,'end')  #get函数中，第一个参数0.0表示从第0行0列开始读取，end表示读取到最后字符串
-        trans = Translate().get_result(t)
-
-
+        trans = Translate().get_result(t,self.From,self.To)
         self.K_label.delete('1.0','end')   #解决翻译内容添加问题，先清空
-
         self.K_label.insert(INSERT,trans)
+
+
+    def en_zh(self):
+        self.From = 'en'
+        self.To = 'zh'
+        t = self.input_window.get(0.0,'end')  #get函数中，第一个参数0.0表示从第0行0列开始读取，end表示读取到最后字符串
+        trans = Translate().get_result(t,self.From,self.To)
+        self.K_label.delete('1.0','end')   #解决翻译内容添加问题，先清空
+        self.K_label.insert(INSERT,trans)
+
+
+    #     #定义转换函数
+    # def calculate(self):
+    #     t = self.input_window.get(0.0,'end')  #get函数中，第一个参数0.0表示从第0行0列开始读取，end表示读取到最后字符串
+    #     trans = Translate().get_result(t)
+    #     self.K_label.delete('1.0','end')   #解决翻译内容添加问题，先清空
+    #     self.K_label.insert(INSERT,trans)
 
 
 temperature_gui = Trans_GUI()
