@@ -1,22 +1,19 @@
 from tkinter import INSERT
-
 import requests
 import execjs
 import tkinter
 from fake_useragent import UserAgent
 
-
+#定义翻译函数
 class Translate:
-    # def __init__(self):
-    #     self.q=''
     def get_result(self,to_trans):
         self.headers = {'Connection': 'keep-alive',
-    'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
-    'Cookie': 'BAIDUID=779675DE60B7773D2B5ABC77906B7546:FG=1; BAIDUID_BFESS=779675DE60B7773D2B5ABC77906B7546:FG=1; BIDUPSID=779675DE60B7773D2B5ABC77906B7546; PSTM=1615268644; BDUSS=ld3RkJWaWt-UDFUSURtYzVoS1pYU1QtdWgyWDh3TWFWVXYxMnd5dEZsTHNoWDlnSVFBQUFBJCQAAAAAAAAAAAEAAADSm7VOZmZqZmdmZ2trAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAOz4V2Ds-FdgU; BDUSS_BFESS=ld3RkJWaWt-UDFUSURtYzVoS1pYU1QtdWgyWDh3TWFWVXYxMnd5dEZsTHNoWDlnSVFBQUFBJCQAAAAAAAAAAAEAAADSm7VOZmZqZmdmZ2trAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAOz4V2Ds-FdgU; __yjs_duid=1_dce50a1623bd207e0ed2c3170cf11d471620617963740; REALTIME_TRANS_SWITCH=1; FANYI_WORD_SWITCH=1; HISTORY_SWITCH=1; SOUND_SPD_SWITCH=1; SOUND_PREFER_SWITCH=1; Hm_lvt_64ecd82404c51e03dc91cb9e8c025574=1621089807,1621158773; Hm_lpvt_64ecd82404c51e03dc91cb9e8c025574=1621158773; __yjs_st=2_MDZmZWQyODMyOTAwMTk0NWVmYjQ2ZjVhNmU5MGJiOTlkMmNlMTdiNGFjMWMxNjg0YTdiYWU5ZjZmOGViYjU5NjY0ZWE4ODgzOTE4ZjY4MDE2OGJjMWU2ODRjYzZiMTBkOTlkZWZiOGM3MjBlZDA2YzRlNDNlZjhiNzVlOWI4NzQzNDBiYWNiOGQ2YjhkNjQ3YzljMmNmYTYxNWI3OWQ1OWIwOGFjOTFiNzExY2UxZjdjMDJmN2U3NmY4YTc1YzM2OGEyZTQ0ZmYzNGU4ZjIxNDI2NDQ1ODJkOWMyN2ZiNTZjZDkwNTc2NzliYzJjZDRkNzhjMDRlYjExMmEyMmQxYV83XzYzZDBiY2E4',
-    'User-Agent':UserAgent().random,
+                        'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+                        'Cookie': 'BAIDUID=779675DE60B7773D2B5ABC77906B7546:FG=1; BAIDUID_BFESS=779675DE60B7773D2B5ABC77906B7546:FG=1; BIDUPSID=779675DE60B7773D2B5ABC77906B7546; PSTM=1615268644; BDUSS=ld3RkJWaWt-UDFUSURtYzVoS1pYU1QtdWgyWDh3TWFWVXYxMnd5dEZsTHNoWDlnSVFBQUFBJCQAAAAAAAAAAAEAAADSm7VOZmZqZmdmZ2trAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAOz4V2Ds-FdgU; BDUSS_BFESS=ld3RkJWaWt-UDFUSURtYzVoS1pYU1QtdWgyWDh3TWFWVXYxMnd5dEZsTHNoWDlnSVFBQUFBJCQAAAAAAAAAAAEAAADSm7VOZmZqZmdmZ2trAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAOz4V2Ds-FdgU; __yjs_duid=1_dce50a1623bd207e0ed2c3170cf11d471620617963740; REALTIME_TRANS_SWITCH=1; FANYI_WORD_SWITCH=1; HISTORY_SWITCH=1; SOUND_SPD_SWITCH=1; SOUND_PREFER_SWITCH=1; Hm_lvt_64ecd82404c51e03dc91cb9e8c025574=1621089807,1621158773; Hm_lpvt_64ecd82404c51e03dc91cb9e8c025574=1621158773; __yjs_st=2_MDZmZWQyODMyOTAwMTk0NWVmYjQ2ZjVhNmU5MGJiOTlkMmNlMTdiNGFjMWMxNjg0YTdiYWU5ZjZmOGViYjU5NjY0ZWE4ODgzOTE4ZjY4MDE2OGJjMWU2ODRjYzZiMTBkOTlkZWZiOGM3MjBlZDA2YzRlNDNlZjhiNzVlOWI4NzQzNDBiYWNiOGQ2YjhkNjQ3YzljMmNmYTYxNWI3OWQ1OWIwOGFjOTFiNzExY2UxZjdjMDJmN2U3NmY4YTc1YzM2OGEyZTQ0ZmYzNGU4ZjIxNDI2NDQ1ODJkOWMyN2ZiNTZjZDkwNTc2NzliYzJjZDRkNzhjMDRlYjExMmEyMmQxYV83XzYzZDBiY2E4',
+                        'User-Agent':UserAgent().random,
         }
 
-
+#定义sign计算过程
         self.js = '''
     function a(r) {
         if (Array.isArray(r)) {
@@ -78,7 +75,7 @@ class Translate:
         p.toString() + "." + (p ^ m)
     }
     
-    var i = null;
+
     '''
 
         self.url = 'https://fanyi.baidu.com/v2transapi'
@@ -101,9 +98,6 @@ class Translate:
         return self.text
 
 
-# trans = Translate().get_result('天气')
-# # print(trans.get_result('天气'))
-# print(trans)
 
 class Trans_GUI:
     def __init__(self):
@@ -115,31 +109,22 @@ class Trans_GUI:
         self.main_window.title('翻译')
         self.main_window.geometry('1000x400')
 
-        #创建三个frame模块
-        # self.top_frame = tkinter.Frame(self.main_window)
+        #创建两个frame模块
         self.mid_f_frame = tkinter.Frame(self.main_window) #放输入文本
         self.mid_r_frame = tkinter.Frame(self.main_window) #显示翻译后文本，左右放置
-        # self.button_frame = tkinter.Frame(self.main_window)
 
         #定义提示输入标签
-        self.show_label = tkinter.Label(self.mid_f_frame,text = '翻译内容（中文）',bg = 'green',font = ('Arial',12),width = 20 ,height = 1)
+        self.show_label = tkinter.Label(self.mid_f_frame,text = '翻译内容（中文）',bg = 'green')
 
         #定义用于显示结果的标签
-        # self.mid_label = tkinter.Label(self.mid_r_frame,text =' 百度翻译结果：')
-        self.m1 = tkinter.Label(self.mid_r_frame, text='百度翻译结果：')   #使用Message，可以自动换行，用于显示多行文本
+        self.m1 = tkinter.Label(self.mid_r_frame, text='百度翻译结果：')
 
-        #使用StringVar创建一个对象
-        # self.value = tkinter.StringVar()
 
         #定义一个标签来接收计算后结果
-        # self.K_label = tkinter.Message(self.mid_r_frame,textvariable = self.value)
-        self.K_label = tkinter.Text(self.mid_r_frame,width=70,height=15,wrap='word')
-
-        # self.K_label['state'] = 'disabled'
+        self.K_label = tkinter.Text(self.mid_r_frame,width=70,height=20,wrap='word')  #采用Text窗格显示结果，和输入一样，可以自动换行 使用wrap = ’word‘，可以使单词不被换行
 
         #定义输入窗格
-        self.input_window = tkinter.Text(self.mid_f_frame,width=70,height=15)   #使用Text函数，可以自动换行，用于输入多行文本
-        # self.input_window.place(x=50,y=20,width=40,height = 10)
+        self.input_window = tkinter.Text(self.mid_f_frame,width=70,height=20)   #使用Text函数，可以自动换行，用于输入多行文本
 
         #定义按钮
         self.calc_button = tkinter.Button(self.main_window,text = 'Convert',command = self.calculate,width = 10)
@@ -147,41 +132,33 @@ class Trans_GUI:
 
 
         #放置按钮
-        # self.calc_button.pack(side = 'left')
-        self.calc_button.place(x=200,y=350,width=100)
-        # self.quit_button.pack(side = 'right')
-        self.quit_button.place(x=600,y=350,width=100)
+        self.calc_button.place(x=200,y=365,width=100)   #使用place放置，采用绝对位置，但必须放置在主窗格中，不能放到frame，因为frame大小不固定
+        self.quit_button.place(x=700,y=365,width=100)
 
         #放置输入窗格与提示标签
         self.show_label.pack(side = 'top')
         self.input_window.pack(side = 'top')
 
         #放置中间显示结果的标签
-        # self.mid_label.pack(side='left')
         self.m1.pack(side='top')
         self.K_label.pack(side = 'top')
 
 
         #放置frame
-        # self.top_frame.pack(side = 'top')
         self.mid_f_frame.pack(side = 'left')
         self.mid_r_frame.pack(side = 'right')
-        # self.button_frame.pack(side = 'bottom')
 
         tkinter.mainloop()
 
         #定义转换函数
     def calculate(self):
         t = self.input_window.get(0.0,'end')  #get函数中，第一个参数0.0表示从第0行0列开始读取，end表示读取到最后字符串
-        print(t)
         trans = Translate().get_result(t)
 
-        # T = t + 273.15
+
+        self.K_label.delete('1.0','end')   #解决翻译内容添加问题，先清空
 
         self.K_label.insert(INSERT,trans)
-        # self.value.set(trans)
-        # self.value =T   #必须用set函数赋值
 
-        # tkinter.messagebox.showinfo('Response', f'{t}摄氏度是{T}开尔文')  # 显示信息 surprise
 
 temperature_gui = Trans_GUI()
