@@ -131,12 +131,14 @@ class Trans_GUI:
         self.quit_button = tkinter.Button(self.main_window,text = 'quit',command = self.main_window.destroy,width = 10,bg= 'red')  #退出窗口
         self.zh_en_button = tkinter.Button(self.main_window,text = '中——》英',command = self.zh_en,width = 10) # 中文转英文
         self.en_zh_button = tkinter.Button(self.main_window,text='英——》中',command = self.en_zh,width = 10)  #英文转中文
+        self.clear_button = tkinter.Button(self.main_window,text='clear',command = self.clear,width = 10)  #英文转中文
 
         #放置按钮
         # self.calc_button.place(x=200,y=365,width=100)   #使用place放置，采用绝对位置，但必须放置在主窗格中，不能放到frame，因为frame大小不固定
         self.quit_button.place(x=800,y=365,width=100)
         self.zh_en_button.place(x=200,y=365,width=100)
-        self.en_zh_button.place(x=500,y=365,width=100)
+        self.en_zh_button.place(x=400,y=365,width=100)
+        self.clear_button.place(x=600,y=365,width=100)
 
         #放置输入窗格与提示标签
         self.show_label.pack(side = 'top')
@@ -170,6 +172,9 @@ class Trans_GUI:
         self.K_label.delete('1.0','end')   #解决翻译内容添加问题，先清空
         self.K_label.insert(INSERT,trans)
 
+    def clear(self):
+        self.K_label.delete('1.0','end')
+        self.input_window.delete('1.0','end')
 
     #     #定义转换函数
     # def calculate(self):
