@@ -1,9 +1,13 @@
+# -*- coding: UTF-8 -*-
 import requests
 import re
 from bs4 import BeautifulSoup
 from fake_useragent import UserAgent
 import time
-from lxml import etree
+import smtplib
+from email.mime.text import MIMEText
+from email.header import Header
+
 
 def get_time():
     # 格式化成2016-03-20 11:45:39形式
@@ -100,13 +104,43 @@ def get_weather(url):
     return str
 
 
+def send_mail(string):
+    # 第三方 SMTP 服务
+    mail_host="mail.strivefysfxyh.com"  #设置服务器
+    mail_user="huyj@strivefysfxyh.com"    #用户名
+    mail_pass="x#3RDK*%JFFZ5f"   #  密码
+
+    sender = 'huyj@strivefysfxyh.com'
+    receivers = ['1499906118@qq.com']  # 接收邮件，可设置为你的QQ邮箱或者其他邮箱
+
+    # message = MIMEText(string, 'plain', 'utf-8')
+    message = MIMEText(string, 'plain')
+    message['From'] = Header("小葫芦")
+    message['To'] =  Header("老婆")
+
+    subject = '天气'  #主题
+    # message['Subject'] = Header(subject,'utf-8')
+    message['Subject'] = Header(subject)
+
+    try:
+        smtpObj = smtplib.SMTP()
+        smtpObj.connect(mail_host, 25)    # 25 为 SMTP 端口号
+        smtpObj.login(mail_user,mail_pass)
+        smtpObj.sendmail(sender, receivers, message.as_string())
+        print ("邮件发送成功")
+    except smtplib.SMTPException:
+        print ("Error: 无法发送邮件")
+
+
+
 def main():
     #拱墅区
     # url = 'http://tianqi.sogou.com/pc/weather/2333616'
     #岳麓区
     url = 'http://tianqi.sogou.com/pc/weather/2332937'
     data = get_time()+'\n'+ get_weather(url)
-    print(data)
+    # print(data)
+    send_mail(data)
 
 if __name__ == '__main__':
     main()
