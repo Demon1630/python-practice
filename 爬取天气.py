@@ -32,7 +32,7 @@ def get_weather(url):
     html = requests.get(url=url,headers=headers)
     respons = html.content.decode('utf-8')
     # print(type(respons))
-    print(respons)
+    # print(respons)
 
     res = BeautifulSoup(respons,'lxml')
 
@@ -45,7 +45,7 @@ def get_weather(url):
     tem = res.find('span',class_='num').text
     # print(type(tem))
     # print(f'当前温度：{tem}')
-    str = str + '\n' + '当前温度：' + tem
+    str = str + '\n' + '当前温度：' + tem +'℃'
 
     #获取今日最高温度
     # tem_high = re.search('y="22">(.*?)</text>',respons)
