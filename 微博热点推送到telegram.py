@@ -56,6 +56,57 @@ def get_content(url):
     return list
     # print(list)
 
+def make_excel():
+    """创建excel表格"""
+    wb = workbook.Workbook()  # 创建Excel对象
+    ws = wb.active  # 获取当前正在操作的表对象
+    # 往表中写入标题行,以列表形式写入！
+    # ws.append(['角色名字', '票数'])
+    ws['A1'] = '排名'
+    ws['B1'] = '关键词'
+    ws['C1'] = '链接'
+
+    # 如果有相同文件，则直接覆盖
+    wb.save("C:\\Users\\Administrator\\Desktop\\微博热点排名.xlsx")
+
+def write_excel(list):
+    """将传入的数据写入"""
+    #先读取，再写入
+    book = openpyxl.load_workbook('C:\\Users\\Administrator\\Desktop\\微博热点排名.xlsx')
+    ws = book.active  # 获取当前正在操作的表对象
+
+    #把第二列关键词提取出来,判断是否存在
+    strs = []
+    for key_word in ws['B']:
+        strs.append(key_word.value)
+
+    if list[1] not in strs:
+        print(f'{list[1]}  关键词不存在,存入并推送')
+        text = list[0] + '  ' + list[1] + '  ' + list[2] + '\n'
+        send_telegram(text)    #关键词之前不存在,则推送并添加进去
+        ws.append(list)
+        book.save("C:\\Users\\Administrator\\Desktop\\微博热点排名.xlsx")
+
+
+
+
+
+def make_wordcloud(text):
+    w = wordcloud.WordCloud(width=1000,
+                            height=700,
+                            background_color='white',
+                            font_path='msyh.ttc')
+
+    txtlist = jieba.lcut(text)
+    string = " ".join(txtlist)
+
+    # 将txt变量传入w的generate()方法，给词云输入文字
+    w.generate(string)
+
+    # 将词云图片导出到当前文件夹
+    w.to_file('C:\\Users\\Administrator\\Desktop\\热点1.png')
+
+
 
 def send_telegram(text):
     chat_id = '1203976293'
@@ -67,14 +118,18 @@ def send_telegram(text):
 
 def main():
     url = 'https://s.weibo.com/top/summary?cate=realtimehot'
+    # make_excel()
     try:
         list = get_content(url)
+        # i = 0
         for l in list:
             if l[0].isdigit() :
-                if int(l[0]) <= 20:
+                if int(l[0]) <= 20:    #获取前20的热点
                     text =  l[0] + '  ' + l[1] + '  '+ l[2] +'\n'
-                    send_telegram(text)
+                    # send_telegram(text)
                     print(text)
+                    # i = write_excel(l, i)
+                    write_excel(l)
     except:
         send_telegram('采集出错了！')
 
