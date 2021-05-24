@@ -1,5 +1,7 @@
 # -*- coding: UTF-8 ...
 import re
+import time
+
 import requests
 from bs4 import BeautifulSoup
 from  fake_useragent import UserAgent
@@ -70,14 +72,28 @@ def make_excel():
     # 如果有相同文件，则直接覆盖
     wb.save("C:\\Users\\Administrator\\Desktop\\微博热点排名.xlsx")
 
-def write_excel(list):
+def write_excel(list,i):
     """将传入的数据写入"""
     #先读取，再写入
     book = openpyxl.load_workbook('C:\\Users\\Administrator\\Desktop\\微博热点排名.xlsx')
     ws = book.active  # 获取当前正在操作的表对象
-    ws.append(list)
+
+    strs = []
+    for l in ws['B']:
+        strs.append(l.value)
+    if list[1] not in strs:
+        print(f'{list[1]}  关键词不存在,存入并推送')
+        ws.append(list)
+        i = i
+        book.save("C:\\Users\\Administrator\\Desktop\\微博热点排名.xlsx")
+    else:
+        i += 1
+        print(f'{list[1]}  关键词存在，不存入')
+
+
+    return i
     #如果有相同文件，则直接覆盖
-    book.save("C:\\Users\\Administrator\\Desktop\\微博热点排名.xlsx")
+
 
 
 def make_wordcloud(text):
@@ -98,18 +114,29 @@ def make_wordcloud(text):
 
 def main():
     url = 'https://s.weibo.com/top/summary?cate=realtimehot'
-    list = get_content(url)
+
     # print(list)
     make_excel()
-    text = ''
-    for l in list:
-        write_excel(l)
-        # print(l[1])
-        text += l[1]
-        # text += ' '
-    print(text)
-    make_wordcloud(text)
+    while True:
+        list = get_content(url)
+        print(list)
+        text = ''
+        i = 0
+        for l in list:
+            if l[0].isdigit() :
+                if int(l[0]) <= 20:
+                    i = write_excel(l,i)
+            # print(l)
+                    text += l[1]
+                    text += ' '
+            # i+=1
+        print(i)
+        if i >= 20:
+            print('近一分钟无新关键词')
 
+        # print(text)
+        make_wordcloud(text)
+        time.sleep(60)
 
 
 
