@@ -7,6 +7,50 @@ import os
 import telegram
 
 
+
+def get_in():
+    url = 'https://compus.xiaofubao.com/login/doLoginBySilent'
+
+    headers = {
+        'Accept':'application/json',
+        'User-Agent':'Mozilla/5.0 (Linux; Android 10; MI 8 Build/QKQ1.190828.002; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/90.0.4430.210 Mobile Safari/537.36 Html5Plus/1.0 (Immersed/32.363636) ZJYXYwebviewbroswer ZJYXYAndroid tourCustomer /yunmaapp.NET/2.1.2/0c5bf2652e3c331c',
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'Host': 'compus.xiaofubao.com',
+        'Connection': 'Keep-Alive',
+        'Accept-Encoding': 'gzip',
+        'Content-Length': '297',
+
+        'Set-Cookie': 'shiroJID=7cd3aaa3-9b6b-4d7d-83e9-ff0a92ae361a',
+        'Path' : '/',
+        'HttpOnly':'',
+        'SameSite' : 'lax',
+
+    }
+
+    key = {
+        'clientId' : '3a2c98574679a76d4fbb1c3cd4bc4f73',
+        'osType' : 'Android',
+        'osVersion' : '10',
+        'mobileType' : 'MI+8',
+        'oaid' : '0c5bf2652e3c331c',
+        'appAllVersion' : '2.1.2',
+        'appWgtVersion' : '2.1.3',
+        'id' : '1906280823241710',
+        'schoolCode' : '19335',
+        'token' : 'b4d44185afbb47bc9d3038c406bb9331',
+        'deviceId' : '0c5bf2652e3c331c',
+        'testAccount' : '1',
+        'appVersion' : '170',
+        'platform' : 'YUNMA_APP',
+    }
+    respons = requests.post(url=url,headers=headers,data=key)
+    return respons.status_code
+
+
+
+
+
+
 def get_info():
 
     # url = 'https://application.xiaofubao.com/app/electric/queryRoomSurplus HTTP/1.1'
@@ -34,7 +78,8 @@ def get_info():
         'Referer': 'https://application.xiaofubao.com/',
         'Accept-Encoding': 'gzip, deflate',
         'Accept-Language': 'zh-CN,zh;q=0.9,en-US;q=0.8,en;q=0.7',
-        'Cookie': 'shiroJID=0cc58557-ede5-40a9-acb8-ab77e569272c',
+        # 'Cookie': 'shiroJID=ca49d8ca-ba77-405a-9723-8c35ba78de7f',  #cookie 隔段时间会变化失效
+        'Cookie': 'shiroJID=7cd3aaa3-9b6b-4d7d-83e9-ff0a92ae361a',  #cookie 隔段时间会变化失效   尝试前面先登入然后设置cookie来看看行不行
     }
 
     key ={
@@ -50,7 +95,7 @@ def get_info():
 
     # print(respons)
     print(respons.status_code)
-    # print(respons.text)
+    print(respons.text)
     # print(type(respons.text))
     if respons.status_code == 200:
         if respons.text.find('操作成功'):
@@ -92,6 +137,7 @@ def send_wechat(text):
 def main():
 
     try:
+        get_in()
         a = get_info()
         # print(type(a))
         send_wechat(a)
