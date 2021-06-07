@@ -81,12 +81,17 @@ def get_info():
     return text
 
 def main():
+    try:
+        t = get_time()
+        text = t + '\n'+get_info()
+        print(f'{t}  \n{text}')
+        send_telegram(text)
+        send_wechat(text)
 
-    t = get_time()
-    text = t + '\n'+get_info()
-    print(f'{t}  \n{text}')
-    send_telegram(text)
-    send_wechat(text)
+    except:
+        print('查询错误')
+        send_telegram('查询错误')
+        send_wechat('查询错误')
 
 # get_info()
 main()
