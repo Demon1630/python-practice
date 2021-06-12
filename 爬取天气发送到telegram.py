@@ -3,7 +3,6 @@ import requests
 import re
 from bs4 import BeautifulSoup
 from fake_useragent import UserAgent
-import time
 import smtplib
 from email.mime.text import MIMEText
 from email.header import Header
@@ -101,15 +100,17 @@ def send_weather(text):
     bot.send_message(chat_id=chat_id, text=text)
 
 def main():
-    try:
-        time = get_time()
-        text = get_weather()
+    while True:
+        try:
+            times = get_time()
+            text = get_weather()
 
-        text  = text+time
-        send_weather(text)
-        print('天气已发送')
-    except:
-        send_weather('爬取天气出现问题')
+            text  = text+times
+            send_weather(text)
+            print(f'天气已发送 {times}')
+        except:
+            send_weather('爬取天气出现问题')
+        time.sleep(600)
 if __name__ == '__main__':
     main()
 

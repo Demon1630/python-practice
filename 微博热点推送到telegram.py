@@ -126,7 +126,7 @@ def main():
             if l[0].isdigit() :
                 if int(l[0]) <= 20:    #获取前20的热点
                     text =  l[0] + '  ' + l[1] + '  '+ l[2] +'\n'
-                    # send_telegram(text)
+                    send_telegram(text)
                     print(text)
                     # i = write_excel(l, i)
                     write_excel(l)

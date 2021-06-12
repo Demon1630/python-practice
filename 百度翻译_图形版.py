@@ -3,13 +3,14 @@ import requests
 import execjs
 import tkinter
 from fake_useragent import UserAgent
+import keyboard
 
 #定义翻译函数
 class Translate:
     def get_result(self,to_trans,From,To):
         self.headers = {'Connection': 'keep-alive',
                         'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
-                        'Cookie': 'BAIDUID=779675DE60B7773D2B5ABC77906B7546:FG=1; BAIDUID_BFESS=779675DE60B7773D2B5ABC77906B7546:FG=1; BIDUPSID=779675DE60B7773D2B5ABC77906B7546; PSTM=1615268644; BDUSS=ld3RkJWaWt-UDFUSURtYzVoS1pYU1QtdWgyWDh3TWFWVXYxMnd5dEZsTHNoWDlnSVFBQUFBJCQAAAAAAAAAAAEAAADSm7VOZmZqZmdmZ2trAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAOz4V2Ds-FdgU; BDUSS_BFESS=ld3RkJWaWt-UDFUSURtYzVoS1pYU1QtdWgyWDh3TWFWVXYxMnd5dEZsTHNoWDlnSVFBQUFBJCQAAAAAAAAAAAEAAADSm7VOZmZqZmdmZ2trAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAOz4V2Ds-FdgU; __yjs_duid=1_dce50a1623bd207e0ed2c3170cf11d471620617963740; REALTIME_TRANS_SWITCH=1; FANYI_WORD_SWITCH=1; HISTORY_SWITCH=1; SOUND_SPD_SWITCH=1; SOUND_PREFER_SWITCH=1; Hm_lvt_64ecd82404c51e03dc91cb9e8c025574=1621089807,1621158773; Hm_lpvt_64ecd82404c51e03dc91cb9e8c025574=1621158773; __yjs_st=2_MDZmZWQyODMyOTAwMTk0NWVmYjQ2ZjVhNmU5MGJiOTlkMmNlMTdiNGFjMWMxNjg0YTdiYWU5ZjZmOGViYjU5NjY0ZWE4ODgzOTE4ZjY4MDE2OGJjMWU2ODRjYzZiMTBkOTlkZWZiOGM3MjBlZDA2YzRlNDNlZjhiNzVlOWI4NzQzNDBiYWNiOGQ2YjhkNjQ3YzljMmNmYTYxNWI3OWQ1OWIwOGFjOTFiNzExY2UxZjdjMDJmN2U3NmY4YTc1YzM2OGEyZTQ0ZmYzNGU4ZjIxNDI2NDQ1ODJkOWMyN2ZiNTZjZDkwNTc2NzliYzJjZDRkNzhjMDRlYjExMmEyMmQxYV83XzYzZDBiY2E4',
+                        'Cookie': 'BAIDUID_BFESS=8A3A527F66D6DCD09ACA098B175B35D5:FG=1; MCITY=-179%3A; BIDUPSID=8A3A527F66D6DCD09ACA098B175B35D5; PSTM=1618113573; BAIDUID=38A1A5BDCFFAAAE2E8BCEE691D62CF43:FG=1; __yjs_duid=1_432ccb0c27473d07b901d45aedfa1f271619615500759; BDUSS=9UcExGRH5OUGROcEVuSldzMDdTVEctZGZ5a2R-Rn5EbnJtS1JObjZhUmNYc05nSVFBQUFBJCQAAAAAAAAAAAEAAACGgrBZAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFzRm2Bc0Ztga0; BDUSS_BFESS=9UcExGRH5OUGROcEVuSldzMDdTVEctZGZ5a2R-Rn5EbnJtS1JObjZhUmNYc05nSVFBQUFBJCQAAAAAAAAAAAEAAACGgrBZAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFzRm2Bc0Ztga0; REALTIME_TRANS_SWITCH=1; HISTORY_SWITCH=1; FANYI_WORD_SWITCH=1; SOUND_PREFER_SWITCH=1; SOUND_SPD_SWITCH=1; Hm_lvt_64ecd82404c51e03dc91cb9e8c025574=1621513227,1621513236; ab_sr=1.0.0_MDY1YzM4ZDc5NWMxZGY5ZjQzZmM3ZGNlNzhkNTNiM2FiYTk1MDM0ODUzNjVhMjI3YWU0NjUwMzkwNGZmM2M0NTQ3M2VmNGViYjAyZTFjMDllNzhlNjQ1MjdkOGQ5NDU4NjA1ZTczYzMwNjczNGU3MGMyNDMxZWE2NDY3MWZlYTI=; __yjs_st=2_ZjkwMzFmNDBkYTE4ZWFiODlhNzE2MjQ2ZjZjMGE0MDQwZDAzZmIyM2MzZmQ2NjIyYzE2MGZkMzE1Zjg3ZDQ2NTkyOTIxYmZkZmRmZTExMWEwM2FjMzM0ZTMzODNkNGJhMzNlN2JhNTdkZDBiYjcwNTFmY2Y3ZDk4MDZlMTZkZjZkNmVmNzljZGY1MGUwMWNiNGFmNjQxZmIzODIxYTAxOWM0ZDM5NmUwYWQxNTYyOWJkNzhkZGUwZDQ4MjRhYjBkMzRhNzA1ZDhkN2E3NDg5ODYyZDE5ZmY1YzdkYzI1NGQxNWRmOGVkZDc0NzhkODYxNjZjZjZlMWE2ZDM5Nzg4NDBlZGVlNWQ4OGVmNDViZTNlZGUyZWRkN2JlMTk4ZTIyXzdfYmU1MDQwMTM=',
                         'User-Agent':UserAgent().random,
         }
 
@@ -82,7 +83,7 @@ class Translate:
 
         self.From = From
         self.To = To
-        self.token= '1cd6523421d1875e890a2aed45029ce2'
+        self.token= '76444dbf57188eabcd7d8cb0542eb47c'
         self.q = to_trans
 
         # q = input('翻译：')
@@ -91,10 +92,12 @@ class Translate:
         'to':self.To,
         'query':self.q,
         'sign':self.sign,
+
         'token':self.token}
 
-        self.text = requests.post(self.url,headers=self.headers,data=self.data).json()['trans_result']['data'][0]['dst']
+        self.text = requests.post(self.url,headers=self.headers,data=self.data).json()#['trans_result']['data'][0]['dst']
         # print(self.text)
+        print(self.sign)
         return self.text
 
 
@@ -153,7 +156,14 @@ class Trans_GUI:
         self.mid_f_frame.pack(side = 'left')
         self.mid_r_frame.pack(side = 'right')
 
+        # self.main_window.bind("<Shift_L>", self.zh_en())
+
         tkinter.mainloop()
+        # keyboard.add_hotkey('ctrl+enter', self.zh_en)
+        # keyboard.add_hotkey('ctrl+enter', self.zh_en())
+        # keyboard.wait('')
+
+
 
     def zh_en(self):
         self.From = 'zh'
@@ -175,6 +185,7 @@ class Trans_GUI:
     def clear(self):
         self.K_label.delete('1.0','end')
         self.input_window.delete('1.0','end')
+
 
     #     #定义转换函数
     # def calculate(self):

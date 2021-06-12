@@ -50,20 +50,23 @@ soup = BeautifulSoup(html,'html.parser')
 
 
 # print(soup.p.attrs)
-# print(soup.div.string)
+# print(soup.div.attrs)
 
-# for i in soup.find_all('p'):
-#     print(i.attrs)
-#     print(i.attrs['class'])
+for i in soup.find_all('p',class_='story'):
+    # print(i.children)
+    # print(i.children.attrs['class'])
+    for j in i.children:
+        print(j)
+
 
 #奇怪
-print(soup.find_all(name='dromouse'))   #为什么name属性不行
-# print(soup.find_all(title="new"))
-print(soup.find_all(class_="title"))
-print(soup.find_all(class_="title",title="new"))   #多个属性过滤
+# print(soup.find_all(name='dromouse'))   #为什么name属性不行
+# # print(soup.find_all(title="new"))
+# print(soup.find_all(class_="title"))
+# print(soup.find_all(class_="title",title="new"))   #多个属性过滤
 
 
-# for i in soup.p.children:
+# for i in soup.div.children:
 #     print(i)
 
 
@@ -76,11 +79,12 @@ print(soup.find_all(class_="title",title="new"))   #多个属性过滤
 # print(soup.title.text)
 #
 #
-#
 # #通过上下级关系获取
 # print(soup.title.parent)   #父级
 # print(soup.title.child)#没有下级返回None
 #
+
+
 # #获取第一个P标签
 # print(soup.p)
 # #获取P的孩子们

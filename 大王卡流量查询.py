@@ -62,7 +62,7 @@ def get_info():
 
     response = requests.post(url=url,headers=headers)
     print(response.status_code)
-    # print(response.text)
+    print(response.text)
     info = eval(str(response.text).replace('false','000').replace('true','111').replace('null','222'))['data']
     print(type(info))
 

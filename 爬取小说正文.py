@@ -22,18 +22,18 @@ def get_content(url):
     print(content_all.group(0))
 
 
-    # contents = re.findall('<p>(.*?)</p>', content_all.group())
-    #
+    contents = re.findall('<p>(.*?)</p>', content_all.group())
+
     # for content in contents:
-    #     # name = chapter['title']
-    #     # name = name.replace('?','')
-    #     # dic = 'C:\\Users\\Administrator\\Desktop\\novel\\'+name+'.txt'
-    #     # f = open(dic, 'a+')
-    #     # f.write(content+'\n')
-    # # print(f'{name}打印成功')
-    #     # print(content_all.group(1))
-    #
-    #     str = content + '\n'
+        # name = chapter['title']
+        # name = name.replace('?','')
+        # dic = 'C:\\Users\\Administrator\\Desktop\\novel\\'+name+'.txt'
+        # f = open(dic, 'a+')
+        # f.write(content+'\n')
+        # print(f'{name}打印成功')
+        # print(content_all.group(1))
+
+        # str = content + '\n'
 
     # print(str)
 

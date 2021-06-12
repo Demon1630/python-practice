@@ -58,12 +58,12 @@ def get_in():
 
     response = requests.get(url=url,headers=headers)
 
-    # print(response.status_code)
+    print(response.status_code)
     # print(response.headers)
     info = eval(str(response.headers))
-    # print(type(info))
+    print(info)
     set_cookie = info['Set-Cookie'].split(';',2)[0]
-    # print(set_cookie)
+    print(set_cookie)
     return set_cookie
 
 
@@ -156,7 +156,7 @@ def main():
             text = get_info(url,cookie,k)
             # print(type(text))
             k = int(text[1])
-            # print(text)
+            print(text)
             # print(text[1])
             text = text[0] + '\n' + '*'*20 +'\n'
             text_all = text_all + text
@@ -165,8 +165,8 @@ def main():
 
         except:
             print('查询出错了')
-            send_wechat(f'{get_time()} hpv疫苗查询出错')
-            send_telegram(f'{get_time()} hpv疫苗查询出错')
+            # send_wechat(f'{get_time()} hpv疫苗查询出错')
+            # send_telegram(f'{get_time()} hpv疫苗查询出错')
             k += 2
     # print(k)
 

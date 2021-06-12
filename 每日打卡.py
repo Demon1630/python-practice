@@ -82,8 +82,11 @@ def get_info():
         'remark':'',
         'address': '%E6%B5%99%E6%B1%9F%E7%9C%81%E6%9D%AD%E5%B7%9E%E5%B8%82%E8%A5%BF%E6%B9%96%E5%8C%BA%E4%B8%89%E5%A2%A9%E9%95%87%E6%B5%99%E6%B1%9F%E5%A4%A7%E5%AD%A6%E8%89%BA%E6%9C%AF%E4%B8%8E%E8%80%83%E5%8F%A4%E5%8D%9A%E7%89%A9%E9%A6%86%E6%B5%99%E6%B1%9F%E5%A4%A7%E5%AD%A6%E7%B4%AB%E9%87%91%E6%B8%AF%E6%A0%A1%E5%8C%BA',
         'area': '%E6%B5%99%E6%B1%9F%E7%9C%81+%E6%9D%AD%E5%B7%9E%E5%B8%82+%E8%A5%BF%E6%B9%96%E5%8C%BA',
-        'province': '%E6%B5%99%E6%B1%9F%E7%9C%81',
-        'city': '%E6%9D%AD%E5%B7%9E%E5%B8%82',
+        # 'province': '%E6%B5%99%E6%B1%9F%E7%9C%81',
+        # 'province': '\\u6d59\\u6c5f\\u7701',
+        'province': '浙江省',
+        # 'city': '%E6%9D%AD%E5%B7%9E%E5%B8%82',
+        'city': '杭州市',
         'geo_api_info': '%7B%22type%22%3A%22complete%22%2C%22info%22%3A%22SUCCESS%22%2C%22status%22%3A1%2C%22cEa%22%3A%22jsonp_598090_%22%2C%22position%22%3A%7B%22Q%22%3A30.29804%2C%22R%22%3A120.07193000000001%2C%22lng%22%3A120.07193%2C%22lat%22%3A30.29804%7D%2C%22message%22%3A%22Get+geolocation+time+out.Get+ipLocation+success.Get+address+success.%22%2C%22location_type%22%3A%22ip%22%2C%22accuracy%22%3Anull%2C%22isConverted%22%3Atrue%2C%22addressComponent%22%3A%7B%22citycode%22%3A%220571%22%2C%22adcode%22%3A%22330106%22%2C%22businessAreas%22%3A%5B%7B%22name%22%3A%22%E8%A5%BF%E6%BA%AA%22%2C%22id%22%3A%22330106%22%2C%22location%22%3A%7B%22Q%22%3A30.271791%2C%22R%22%3A120.09102999999999%2C%22lng%22%3A120.09103%2C%22lat%22%3A30.271791%7D%7D%5D%2C%22neighborhoodType%22%3A%22%22%2C%22neighborhood%22%3A%22%22%2C%22building%22%3A%22%22%2C%22buildingType%22%3A%22%22%2C%22street%22%3A%22%E4%BD%99%E6%9D%AD%E5%A1%98%E8%B7%AF%22%2C%22streetNumber%22%3A%22900%E5%8F%B7%22%2C%22country%22%3A%22%E4%B8%AD%E5%9B%BD%22%2C%22province%22%3A%22%E6%B5%99%E6%B1%9F%E7%9C%81%22%2C%22city%22%3A%22%E6%9D%AD%E5%B7%9E%E5%B8%82%22%2C%22district%22%3A%22%E8%A5%BF%E6%B9%96%E5%8C%BA%22%2C%22township%22%3A%22%E4%B8%89%E5%A2%A9%E9%95%87%22%7D%2C%22formattedAddress%22%3A%22%E6%B5%99%E6%B1%9F%E7%9C%81%E6%9D%AD%E5%B7%9E%E5%B8%82%E8%A5%BF%E6%B9%96%E5%8C%BA%E4%B8%89%E5%A2%A9%E9%95%87%E6%B5%99%E6%B1%9F%E5%A4%A7%E5%AD%A6%E8%89%BA%E6%9C%AF%E4%B8%8E%E8%80%83%E5%8F%A4%E5%8D%9A%E7%89%A9%E9%A6%86%E6%B5%99%E6%B1%9F%E5%A4%A7%E5%AD%A6%E7%B4%AB%E9%87%91%E6%B8%AF%E6%A0%A1%E5%8C%BA%22%2C%22roads%22%3A%5B%5D%2C%22crosses%22%3A%5B%5D%2C%22pois%22%3A%5B%5D%7D',
         'created': '1622766621',
         'qksm':'',
@@ -164,6 +167,7 @@ def send_wechat(text):
 def main():
     try:
         info = get_info()
+        # print(info)
         send_wechat(info)
         send_telegram(info)
 
