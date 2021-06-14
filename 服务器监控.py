@@ -23,20 +23,39 @@ def send_telegram(text):
 
     bot.send_message(chat_id=chat_id, text=text)
 
+def send_wechat(title,text,detal_url):
 
-def send_wechat(text):
-    # url = 'https://sc.ftqq.com/SCU93555Tc0608f46612b3f58458bc7236a6b17285e91f9c6173ab.send'
-    url = 'https://sctapi.ftqq.com/SCT43501TagBvqSsCzQ5zc1ZyBbthfB8L.send'
+    get_acs_token_url = 'https://qyapi.weixin.qq.com/cgi-bin/gettoken?corpid=ww428187fbdb9fd50f&corpsecret=po3lAng2YdZzaa67teFhmOxL34EuuWpffdiZlQeGaNk'
+
+    access = requests.get(url=get_acs_token_url)
+    access_token = eval(access.text)['access_token']
+    # print(type(eval(access_token.text)))
+    # print(access_token)
+    url = f'https://qyapi.weixin.qq.com/cgi-bin/message/send?access_token={access_token}'
+    # print(url)
     headers = {
-            'User-Agent':UserAgent().random
+        'User-Agent': UserAgent().random
     }
-    key = {
-        'title':'主机监控',
-        'desp':text,
-    }
-    response = requests.post(url=url,headers=headers,data=key)
-    # print(response)
 
+    key = {
+        "touser": "@all",
+        # "toparty": "PartyID1|PartyID2",
+        # "totag": "TagID1 | TagID2",
+        "msgtype": "textcard",
+        "agentid": 1000002,
+        # "text": '测试',
+        "textcard": {
+            "title": title,
+            "description": text,#"<div class=\"gray\">2016年9月26日</div> <div class=\"normal\">恭喜你抽中iPhone 7一台，领奖码：xxxx</div><div class=\"highlight\">请于2016年10月10日前联系行政同事领取</div>",
+            "url": detal_url,
+            "btntxt": "更多"
+        },
+        "safe": 0,
+        "enable_id_trans": 0,
+        "enable_duplicate_check": 0,
+        "duplicate_check_interval": 1800
+    }
+    res = requests.post(url=url,headers=headers,json=key)
 
 
 
@@ -75,12 +94,12 @@ def get_info():
 
         if hdd >80:
             warm1 = f'警告 {info["name"]} 硬盘使用过高，超过80%'
-            send_wechat(warm1)
+            send_wechat('主机监控',warm1,'https://www.demon1630.ga/')
             send_telegram(warm1)
             # print(warm1)
         if memory >85:
             warm2 = f'警告 {info["name"]} 内存使用过高，超过85%'
-            send_wechat(warm2)
+            send_wechat('主机监控',warm2,'https://www.demon1630.ga/')
             send_telegram(warm2)
             # print(warm2)
 
@@ -94,9 +113,9 @@ def main():
     try:
         info = get_info()
         send_telegram(info)
-        send_wechat(info)
+        send_wechat('主机监控',info,'https://www.demon1630.ga/')
     except:
-        send_wechat('查询出错')
+        send_wechat('主机监控','查询出错','https://www.demon1630.ga/')
         send_telegram('查询出错')
 
 if __name__ == '__main__':
