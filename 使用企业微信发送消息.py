@@ -48,7 +48,7 @@ def send_wechat(title,text,detal_url):
     }
 
     res = requests.post(url=url,headers=headers,json=key)
-    print(res.status_code)
-    print(res.text)
+    # print(res.status_code)
+    # print(res.text)
 
 send_wechat('测试','你好啊','URL')
