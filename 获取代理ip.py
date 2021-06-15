@@ -9,43 +9,17 @@ import smtplib
 from email.mime.text import MIMEText
 from email.header import Header
 import time
+from openpyxl import workbook  # 写入Excel表所用
+from openpyxl import load_workbook  # 读取Excel表所用
+import openpyxl
+import random
 
+def get_ip(url):
+    '''
+    从免费代理IP网站获取代理IP
+    '''
 
-
-def check_ip(ip_list):
-    #访问网址
-    # url = 'http://www.whatismyip.com.tw/'
-    url = 'http://icanhazip.com'
-    # url = 'http://httpbin.org/ip'
-    #这是代理IP
-    # ip = '125.177.124.73:80'
-
-    ip_useful_list = []
-
-    for ip in ip_list:
-        # ip = '103.103.3.6:8080'
-        # ip = '131.161.68.37:31264'
-        #设置代理ip访问方式，http和https
-        proxy = {'http':ip,'https':ip}
-        # proxy = {'http':'http://103.103.3.6:8080','https':'https://103.103.3.6:8080'}
-        #创建ProxyHandler
-        try:
-            response = requests.get(url=url,proxies=proxy,timeout=2)
-
-            print(response.status_code)
-            print(response.text)
-            print(f'{ip}有效')
-            ip_useful_list.append(ip)
-
-
-        except:
-            print(f'{ip}无效')
-
-    return ip_useful_list
-
-def get_ip():
-
-    url = 'http://www.xiladaili.com/gaoni/'
+    # url = 'http://www.xiladaili.com/gaoni/'
 
     headers= {
         'User-Agent': UserAgent().random
@@ -57,39 +31,133 @@ def get_ip():
     info = bs.find('tbody')
     data = info.find_all('tr')
     # print(data)
-    ip_list=[]
+
+    ip_list=[]   #将获取到的IP用列表存储
     for i in data:
-        # print(str(i))
-        # detal = str(i)
-        ip_port = i.find_all('td')[0].string
-        tpy = i.find_all('td')[1].string
-        time_yanchi = i.find_all('td')[4].string
-        core = i.find_all('td')[7].string
-
-        if tpy != 'HTTP代理':
-            ip_list.append(ip_port)
-
-        print(f'ip和端口：{ip_port},类型：{tpy},响应时间：{time_yanchi},分数：{core}')
-
-        # for j in i.find_all('td'):
-        #     print(j)
-        # print(type(detal))
-
-    # print(type(data))
-    # print(ip_list)
+        dic = {}
+        ip_port = i.find_all('td')[0].string          #拆分IP和端口
+        tpy = i.find_all('td')[1].string              #拆分类型 http或https
+        time_yanchi = i.find_all('td')[4].string      #响应时间
+        core = i.find_all('td')[7].string             #打分
 
 
+        if tpy != 'HTTP代理':           #把https存起来，因为使用中主要还是使用https
+            dic['ip_port']=ip_port
+            dic['tpy']=tpy
+            dic['time_yanchi']=time_yanchi
+            dic['core']=core
 
-    # print(respons.status_code)
-    # print(respons.text)
+            ip_list.append(dic)    #用字典形式存入列表中
 
-    return ip_list
+        # print(f'ip和端口：{ip_port},类型：{tpy},响应时间：{time_yanchi},分数：{core}')
+
+    return ip_list   #将获取到的IP列表返回
+
+
+def check_ip(ip_list):
+    '''
+    检测IP是否有效，但在pycharm中一直返回的是本身IP，而在vps中运行时则会正常。。。不知道怎么回事
+    '''
+    # 访问网址
+    # url = 'http://www.whatismyip.com.tw/'
+    url = 'http://icanhazip.com'  # 用来检测IP是否可以正常使用
+    # url = 'http://httpbin.org/ip'
+
+    # 这是代理IP
+    ip_useful_list = []
+    for dic_ip in ip_list:
+        ip = dic_ip['ip_port']
+        # 设置代理ip访问方式，http和https
+        proxy = {'http': ip, 'https': ip}
+        # 创建ProxyHandler
+        try:
+            response = requests.get(url=url, proxies=proxy, timeout=2)
+
+            # print(response.status_code)
+            # print(response.text)
+            print(f'{dic_ip}有效')
+            ip_useful_list.append(dic_ip)  # 有效则把IP添加到列表中
+        except:
+            print(f'{dic_ip}无效')
+    return ip_useful_list
+
+
+def write_excel(list):
+    """将传入的数据写入"""
+    #先读取，再写入
+    book = openpyxl.load_workbook('C:\\Users\\Administrator\\Desktop\\代理IP.xlsx')
+    ws = book.active  # 获取当前正在操作的表对象
+
+    #把ip提取出来,判断是否存在
+
+    strs = []
+    for key_word in ws['A']:
+        strs.append(key_word.value)
+
+    j = ws.max_row  #获取行数，添加到后面去，就不会把前面的覆盖掉
+    for ip_info in list:
+        ip_port = ip_info['ip_port']
+        if ip_port not in strs:
+            print(f'{ip_info}  不存在,存入')
+            # text = list[0] + '  ' + list[1] + '  ' + list[2] + '\n'
+            # send_telegram(text)    #关键词之前不存在,则推送并添加进去
+            # ws.append(ip_info)   #不能直接写进去，要先读取字典
+
+            j += 1
+            # for item in ip_info.items():
+            # j +=1
+            ws['A'+str(j)].value=ip_info['ip_port']
+            ws['B'+str(j)].value=ip_info['tpy']
+            ws['C'+str(j)].value=ip_info['time_yanchi']
+            ws['D'+str(j)].value=ip_info['core']
+
+
+            book.save("C:\\Users\\Administrator\\Desktop\\代理IP.xlsx")
+            print(f'{len(list)}个IP写入成功')
+
+
+
+def get_excel():
+    '''
+    从excle文件中随机读取一个ip，然后判断是否有效，并输出
+    :return:
+    '''
+
+    book = openpyxl.load_workbook('C:\\Users\\Administrator\\Desktop\\代理IP.xlsx')
+    ws = book.active  # 获取当前正在操作的表对象
+
+    k = ws.max_row
+    while True:
+        i = random.randint(1,k)
+        ip_port = ws['A'+str(i)].value
+        print(ip_port)
+
+        url = 'http://icanhazip.com'  # 用来检测IP是否可以正常使用
+        proxy = {'http':ip_port, 'https':ip_port}
+        try:
+            response = requests.get(url=url, proxies=proxy, timeout=2)
+
+            print(f'{ip_port}有效')
+            return ip_port
+        except:
+            print(f'{ip_port}无效')
+            ws.delete_rows(i)  # 无效则删除第i行，后面数据补充上去
+            book.save("C:\\Users\\Administrator\\Desktop\\代理IP.xlsx")
+
+
 
 def main():
-    ip_list = get_ip()
 
-    ip_useful_list = check_ip(ip_list)
+    for i in range(1,5):   #把前四页的爬取出来
+        url = 'http://www.xiladaili.com/gaoni/'+str(i)+'/'
+        ip_list = get_ip(url)
+        ip_useful_list = check_ip(ip_list)
+        print(ip_useful_list)
+        write_excel(ip_useful_list)
 
-    print(ip_useful_list)
+    #从exel中获取一个有效ip并返回
+    ip_useful = get_excel()
+    print(ip_useful)
+
 
 main()
