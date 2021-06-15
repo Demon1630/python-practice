@@ -9,6 +9,10 @@ import smtplib
 from email.mime.text import MIMEText
 from email.header import Header
 import time
+import random
+import openpyxl
+
+
 
 
 def get_time():
@@ -68,7 +72,7 @@ def send_wechat(title,text,detal_url):
 # send_wechat('测试','你好啊','URL')
 
 
-
+'''
 
 def check_ip(ip_list):
     #访问网址
@@ -142,8 +146,35 @@ def get_ip():
     # print(respons.text)
 
     return ip_list
+'''
 
 
+def get_excel():
+    '''
+    从excle文件中随机读取一个ip，然后判断是否有效，并输出
+    :return:
+    '''
+
+    book = openpyxl.load_workbook('C:\\Users\\Administrator\\Desktop\\代理IP.xlsx')
+    ws = book.active  # 获取当前正在操作的表对象
+
+    k = ws.max_row
+    while True:
+        i = random.randint(2,k)   #获取随机的一个IP
+        ip_port = ws['A'+str(i)].value
+        print(ip_port)
+
+        url = 'http://icanhazip.com'  # 用来检测IP是否可以正常使用
+        proxy = {'http':ip_port, 'https':ip_port}
+        try:
+            response = requests.get(url=url, proxies=proxy, timeout=2)
+
+            print(f'{ip_port}有效')
+            return ip_port
+        except:
+            print(f'{ip_port}无效')
+            ws.delete_rows(i)  # 无效则删除第i行，后面数据补充上去
+            book.save("C:\\Users\\Administrator\\Desktop\\代理IP.xlsx")
 
 
 
@@ -239,13 +270,15 @@ def get_info(url,cookie,k,ip):
 # get_info()
 
 def main():
-    ip_list = get_ip()
+    # ip_list = get_ip()
+    #
+    # ip_useful_list = check_ip(ip_list)
+    #
+    # print(ip_useful_list)
 
-    ip_useful_list = check_ip(ip_list)
+    ip = get_excel()
 
-    print(ip_useful_list)
-
-    cookie = get_in(ip_useful_list[0])
+    cookie = get_in(ip)
     url_list = ['https://cloud.cn2030.com/sc/wx/HandlerSubscribe.ashx?act=CustomerProduct&id=4846&lat=30.27415&lng=120.15515&key302=2b7b75179a&expire302=1623027327',
                 'https://cloud.cn2030.com/sc/wx/HandlerSubscribe.ashx?act=CustomerProduct&id=3653&lat=30.27415&lng=120.15515&key302=06da522bf2&expire302=1623028311',
                 'https://cloud.cn2030.com/sc/wx/HandlerSubscribe.ashx?act=CustomerProduct&id=4851&lat=30.27415&lng=120.15515&key302=ae9b132ff0&expire302=1623030780',
@@ -266,26 +299,42 @@ def main():
     text_all = get_time() + '\n'
 
     k = 0
+
+
+
     for url in url_list:
         # print(url)
-        try:
-            text = get_info(url,cookie,k,ip_useful_list[0])
-            # print(type(text))
-            k = int(text[1])
-            print(text)
-            # print(text[1])
-            text = text[0] + '\n' + '*'*20 +'\n'
-            text_all = text_all + text
-            time.sleep(10)
-            # print(text)
+        j = 1
+        while j <= 10:
+            try:
+                text = get_info(url,cookie,k,ip)
+                # print(type(text))
+                k = int(text[1])
+                print(text)
+                # print(text[1])
+                text = text[0] + '\n' + '*'*20 +'\n'
+                text_all = text_all + text
+                time.sleep(2)
+                # print(text)
 
-        except:
-            print('查询出错了')
-            # send_wechat(f'{get_time()} hpv疫苗查询出错')
-            # send_telegram(f'{get_time()} hpv疫苗查询出错')
-            # time.sleep(10)
-            k += 2
-    # print(k)
+                k = k-2
+                break
+
+            except:
+                print(f'查询出错了{j}次')
+                if j == 5:
+                    ip = get_excel()
+                    print(f'出错5次，换新IP：{ip}')
+                elif j == 10:
+                    print('出错10次，查询下一家医院')
+                else:
+                    j +=1
+                    time.sleep(2)
+                # send_wechat(f'{get_time()} hpv疫苗查询出错')
+                # send_telegram(f'{get_time()} hpv疫苗查询出错')
+                # time.sleep(10)
+        k += 2
+        print(k)
 
 
     if k == 32:
