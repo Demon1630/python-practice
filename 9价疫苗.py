@@ -25,23 +25,134 @@ def send_telegram(text):
     bot.send_message(chat_id=chat_id, text=text)
 
 
-def send_wechat(text):
-    # url = 'https://sc.ftqq.com/SCU93555Tc0608f46612b3f58458bc7236a6b17285e91f9c6173ab.send'
-    url = 'https://sctapi.ftqq.com/SCT43501TagBvqSsCzQ5zc1ZyBbthfB8L.send'
+def send_wechat(title,text,detal_url):
+
+    get_acs_token_url = 'https://qyapi.weixin.qq.com/cgi-bin/gettoken?corpid=ww428187fbdb9fd50f&corpsecret=po3lAng2YdZzaa67teFhmOxL34EuuWpffdiZlQeGaNk'
+
+    access = requests.get(url=get_acs_token_url)
+    access_token = eval(access.text)['access_token']
+    # print(type(eval(access_token.text)))
+    # print(access_token)
+
+
+    url = f'https://qyapi.weixin.qq.com/cgi-bin/message/send?access_token={access_token}'
+    # print(url)
+
     headers = {
-            'User-Agent':UserAgent().random
+        'User-Agent': UserAgent().random
     }
+
     key = {
-        'title':'hpv疫苗通知',
-        'desp':text,
+        "touser": "@all",
+        # "toparty": "PartyID1|PartyID2",
+        # "totag": "TagID1 | TagID2",
+        "msgtype": "textcard",
+        "agentid": 1000002,
+        # "text": '测试',
+        "textcard": {
+            "title": title,
+            "description": text,#"<div class=\"gray\">2016年9月26日</div> <div class=\"normal\">恭喜你抽中iPhone 7一台，领奖码：xxxx</div><div class=\"highlight\">请于2016年10月10日前联系行政同事领取</div>",
+            "url": detal_url,
+            "btntxt": "更多"
+        },
+        "safe": 0,
+        "enable_id_trans": 0,
+        "enable_duplicate_check": 0,
+        "duplicate_check_interval": 1800
     }
-    response = requests.post(url=url,headers=headers,data=key)
-    # print(response)
+
+    res = requests.post(url=url,headers=headers,json=key)
+    # print(res.status_code)
+    # print(res.text)
+
+# send_wechat('测试','你好啊','URL')
 
 
 
-def get_in():
 
+def check_ip(ip_list):
+    #访问网址
+    # url = 'http://www.whatismyip.com.tw/'
+    url = 'http://icanhazip.com'
+    # url = 'http://httpbin.org/ip'
+    #这是代理IP
+    # ip = '125.177.124.73:80'
+
+    ip_useful_list = []
+
+    for ip in ip_list:
+        # ip = '103.103.3.6:8080'
+        # ip = '131.161.68.37:31264'
+        #设置代理ip访问方式，http和https
+        proxy = {'http':ip,'https':ip}
+        # proxy = {'http':'http://103.103.3.6:8080','https':'https://103.103.3.6:8080'}
+        #创建ProxyHandler
+        try:
+            response = requests.get(url=url,proxies=proxy,timeout=2)
+
+            # print(response.status_code)
+            # print(response.text)
+            print(f'{ip}有效')
+            ip_useful_list.append(ip)
+
+
+        except:
+            print(f'{ip}无效')
+
+    return ip_useful_list
+
+def get_ip():
+
+    url = 'http://www.xiladaili.com/gaoni/'
+
+    headers= {
+        'User-Agent': UserAgent().random
+    }
+
+    respons = requests.get(url=url,headers=headers)
+
+    bs =BeautifulSoup(respons.content,'html.parser')
+    info = bs.find('tbody')
+    data = info.find_all('tr')
+    # print(data)
+    ip_list=[]
+    for i in data:
+        # print(str(i))
+        # detal = str(i)
+        ip_port = i.find_all('td')[0].string
+        tpy = i.find_all('td')[1].string
+        time_yanchi = i.find_all('td')[4].string
+        core = i.find_all('td')[7].string
+        if tpy != 'HTTP代理':
+            ip_list.append(ip_port)
+        # ip_list.append(ip_port)
+
+        # print(f'ip和端口：{ip_port},类型：{tpy},响应时间：{time_yanchi},分数：{core}')
+
+        # for j in i.find_all('td'):
+        #     print(j)
+        # print(type(detal))
+
+    # print(type(data))
+    # print(ip_list)
+
+
+
+    # print(respons.status_code)
+    # print(respons.text)
+
+    return ip_list
+
+
+
+
+
+
+
+
+def get_in(ip):
+    proxy = {'https': ip}
+    print(ip)
     url = 'https://cloud.cn2030.com/sc/wx/HandlerSubscribe.ashx?act=auth&code=073YxKkl2usAa74gpcnl2ay1sO1YxKkH&key302=2caf893321&expire302=1623027326'
 
     headers = {
@@ -56,7 +167,7 @@ def get_in():
 
     }
 
-    response = requests.get(url=url,headers=headers)
+    response = requests.get(url=url,headers=headers,proxies=proxy)
 
     print(response.status_code)
     # print(response.headers)
@@ -69,9 +180,8 @@ def get_in():
 
 # get_in()
 
-def get_info(url,cookie,k):
-
-
+def get_info(url,cookie,k,ip):
+    proxy = {'https': ip}
     # url = 'https://cloud.cn2030.com/sc/wx/HandlerSubscribe.ashx?act=CustomerProduct&id=3653&lat=30.27415&lng=120.15515&key302=06da522bf2&expire302=1623028311'
     # url = 'https://cloud.cn2030.com/sc/wx/HandlerSubscribe.ashx?act=CustomerProduct&id=4846&lat=30.27415&lng=120.15515&key302=2b7b75179a&expire302=1623027327'
     # url = 'https://cloud.cn2030.com/sc/wx/HandlerSubscribe.ashx?act=CustomerProduct&id=4851&lat=30.27415&lng=120.15515&key302=ae9b132ff0&expire302=1623030780'
@@ -89,7 +199,7 @@ def get_info(url,cookie,k):
 
     }
 
-    response = requests.get(url=url,headers=headers)
+    response = requests.get(url=url,headers=headers,proxies=proxy)
     # print(response.status_code)
     # print(response.text)
     info = eval(str(response.text.replace('true','111').replace('false','000')))
@@ -107,10 +217,10 @@ def get_info(url,cookie,k):
         # print(f'{i["text"]} 价格:{i["price"]}   {i["BtnLable"]}， 预约时间：{i["date"]}')
         if str(i["date"])  != '暂无' :
             send_telegram(f'{i["text"]} 价格:{i["price"]}   {i["BtnLable"]}， 预约时间：{i["date"]}  地址：{addr}，请登录知苗预约小程序准备预约')
-            send_wechat(f'{i["text"]} 价格:{i["price"]}   {i["BtnLable"]}， 预约时间：{i["date"]}  地址：{addr}，请登录知苗预约小程序准备预约')
+            send_wechat('九价疫苗',f'{i["text"]} 价格:{i["price"]}   {i["BtnLable"]}， 预约时间：{i["date"]}  地址：{addr}，请登录知苗预约小程序准备预约',f'{url}')
         elif str(i["BtnLable"]) != '暂未开始':
             send_telegram(f'{i["text"]} 价格:{i["price"]}   {i["BtnLable"]}， 预约时间：{i["date"]}  地址：{addr}，请登录知苗预约小程序准备预约')
-            send_wechat(f'{i["text"]} 价格:{i["price"]}   {i["BtnLable"]}， 预约时间：{i["date"]}  地址：{addr}，请登录知苗预约小程序准备预约')
+            send_wechat('九价疫苗',f'{i["text"]} 价格:{i["price"]}   {i["BtnLable"]}， 预约时间：{i["date"]}  地址：{addr}，请登录知苗预约小程序准备预约',f'{url}')
         else:
             k += 1
 
@@ -129,7 +239,13 @@ def get_info(url,cookie,k):
 # get_info()
 
 def main():
-    cookie = get_in()
+    ip_list = get_ip()
+
+    ip_useful_list = check_ip(ip_list)
+
+    print(ip_useful_list)
+
+    cookie = get_in(ip_useful_list[0])
     url_list = ['https://cloud.cn2030.com/sc/wx/HandlerSubscribe.ashx?act=CustomerProduct&id=4846&lat=30.27415&lng=120.15515&key302=2b7b75179a&expire302=1623027327',
                 'https://cloud.cn2030.com/sc/wx/HandlerSubscribe.ashx?act=CustomerProduct&id=3653&lat=30.27415&lng=120.15515&key302=06da522bf2&expire302=1623028311',
                 'https://cloud.cn2030.com/sc/wx/HandlerSubscribe.ashx?act=CustomerProduct&id=4851&lat=30.27415&lng=120.15515&key302=ae9b132ff0&expire302=1623030780',
@@ -153,31 +269,32 @@ def main():
     for url in url_list:
         # print(url)
         try:
-            text = get_info(url,cookie,k)
+            text = get_info(url,cookie,k,ip_useful_list[0])
             # print(type(text))
             k = int(text[1])
             print(text)
             # print(text[1])
             text = text[0] + '\n' + '*'*20 +'\n'
             text_all = text_all + text
-            time.sleep(2)
+            time.sleep(10)
             # print(text)
 
         except:
             print('查询出错了')
             # send_wechat(f'{get_time()} hpv疫苗查询出错')
             # send_telegram(f'{get_time()} hpv疫苗查询出错')
+            # time.sleep(10)
             k += 2
     # print(k)
 
 
     if k == 32:
         print('暂时都不可预约')
-        send_wechat(f'{get_time()} hpv疫苗暂时都不可预约')
+        send_wechat('九价疫苗',f'{get_time()} hpv疫苗暂时都不可预约','URL')
         send_telegram(f'{get_time()}  hpv疫苗暂时都不可预约')
     else:
         print('有疫苗可预约')
-        send_wechat(f'{get_time()} hpv疫苗有可以预约的了，快去准备预约')
+        send_wechat('九价疫苗',f'{get_time()} hpv疫苗有可以预约的了，快去准备预约','URL')
         send_telegram(f'{get_time()}  hpv疫苗有可以预约的了，快去准备预约')
 
 
