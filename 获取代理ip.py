@@ -137,7 +137,7 @@ def write_excel(list):
 
 
 
-def get_excel():
+def get_excel_ip():
     '''
     从excle文件中随机读取一个ip，然后判断是否有效，并输出
     :return:
@@ -164,11 +164,24 @@ def get_excel():
             ws.delete_rows(i)  # 无效则删除第i行，后面数据补充上去
             book.save("C:\\Users\\Administrator\\Desktop\\代理IP.xlsx")
 
+def delate_ip(ip):
+
+    book = openpyxl.load_workbook('C:\\Users\\Administrator\\Desktop\\代理IP.xlsx')
+    ws = book.active  # 获取当前正在操作的表对象
+
+    strs = []
+    for key_word in ws['A']:
+        strs.append(key_word.value)
+
+    j = strs.index(ip)
+    ws.delete_rows(j)  # 无效则删除第i行，后面数据补充上去
+    book.save("C:\\Users\\Administrator\\Desktop\\代理IP.xlsx")
+    print(f'{ip}无效，删除')
 
 
 def main():
 
-    new_ip = get_excel()
+    new_ip = get_excel_ip()
     i = 1
     j = 1
     while i <=25:
@@ -184,7 +197,7 @@ def main():
             # print(ip_useful_list)
             if len(ip_list) == 0:
 
-                new_ip = get_excel()
+                new_ip = get_excel_ip()
                 print(f'第{i}页ip爬取出错{j}次，更换IP:{new_ip}重新爬取')
                 if j >8:
                     print(f'出错8次，跳过第{i}页')
@@ -206,7 +219,7 @@ def main():
 
 
         except:
-            new_ip = get_excel()
+            new_ip = get_excel_ip()
             print(f'第{i}页ip爬取出错{j}次，更换IP:{new_ip}重新爬取')
             if j >8:
                 print(f'出错8次，跳过第{i}页')
