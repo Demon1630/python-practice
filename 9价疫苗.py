@@ -331,7 +331,7 @@ def main():
     for url in url_list:
         # print(url)
         j = 1
-        while j <= 10:
+        while j <= 20:
             try:
                 text = get_info(url,cookie,k,ip)
                 # print(type(text))
@@ -358,9 +358,15 @@ def main():
                     ip = get_excel()
                     print(f'出错10次，换新IP：{ip}')
                     j += 1
-                elif j == 15:
+
+                elif j ==15:
                     delate_ip(ip)
-                    print('出错15次，查询下一家医院')
+                    ip = get_excel()
+                    print(f'出错15次，换新IP：{ip}')
+                    j += 1
+                elif j == 20:
+                    delate_ip(ip)
+                    print('出错20次，查询下一家医院')
 
                 else:
                     j +=1
