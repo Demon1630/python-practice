@@ -14,7 +14,7 @@ from openpyxl import load_workbook  # 读取Excel表所用
 import openpyxl
 import random
 
-def get_ip(url):
+def get_ip(url,new_ip):
     '''
     从免费代理IP网站获取代理IP
     '''
@@ -22,13 +22,30 @@ def get_ip(url):
     # url = 'http://www.xiladaili.com/gaoni/'
 
     headers= {
-        'User-Agent': UserAgent().random
+        # 'User-Agent': UserAgent().random
+        'Accept':'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
+        'Accept-Encoding':'gzip, deflate',
+        'Accept-Language':'zh-CN,zh;q=0.9,zh-TW;q=0.8,en;q=0.7',
+        'Cache-Control':'max-age=0',
+        'Connection':'keep-alive',
+        'DNT': '1',
+        'Host': 'www.xiladaili.com',
+        # 'Referer':'http://www.xiladaili.com/gaoni/7/',
+        'Upgrade-Insecure-Requests': '1',
+        'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.101 Safari/537.36',
+
     }
 
-    respons = requests.get(url=url,headers=headers)
+    proxy = {'http': new_ip, 'https': new_ip}
+
+    respons = requests.get(url=url,headers=headers,proxies= proxy)
+
+    # print(respons.status_code)
+    # print(respons.text)
 
     bs =BeautifulSoup(respons.content,'html.parser')
     info = bs.find('tbody')
+    # print(info)
     data = info.find_all('tr')
     # print(data)
 
@@ -41,18 +58,20 @@ def get_ip(url):
         core = i.find_all('td')[7].string             #打分
 
 
-        if tpy != 'HTTP代理':           #把https存起来，因为使用中主要还是使用https
-            dic['ip_port']=ip_port
-            dic['tpy']=tpy
-            dic['time_yanchi']=time_yanchi
-            dic['core']=core
+        # if tpy != 'HTTP代理':           #把https存起来，因为使用中主要还是使用https
+        dic['ip_port']=ip_port
+        dic['tpy']=tpy
+        dic['time_yanchi']=time_yanchi
+        dic['core']=core
 
-            ip_list.append(dic)    #用字典形式存入列表中
+        ip_list.append(dic)    #用字典形式存入列表中
 
         # print(f'ip和端口：{ip_port},类型：{tpy},响应时间：{time_yanchi},分数：{core}')
-
+    # print(ip_list)
     return ip_list   #将获取到的IP列表返回
 
+
+# get_ip('http://www.xiladaili.com/gaoni/6/','')
 
 def check_ip(ip_list):
     '''
@@ -79,6 +98,7 @@ def check_ip(ip_list):
             ip_useful_list.append(dic_ip)  # 有效则把IP添加到列表中
         except:
             print(f'{dic_ip}无效')
+            # continue
     return ip_useful_list
 
 
@@ -113,7 +133,7 @@ def write_excel(list):
 
 
             book.save("C:\\Users\\Administrator\\Desktop\\代理IP.xlsx")
-            print(f'{len(list)}个IP写入成功')
+            # print(f'{ip_port}写入成功')
 
 
 
@@ -128,19 +148,19 @@ def get_excel():
 
     k = ws.max_row
     while True:
-        i = random.randint(1,k)
+        i = random.randint(2,k)
         ip_port = ws['A'+str(i)].value
-        print(ip_port)
+        # print(ip_port)
 
         url = 'http://icanhazip.com'  # 用来检测IP是否可以正常使用
         proxy = {'http':ip_port, 'https':ip_port}
         try:
             response = requests.get(url=url, proxies=proxy, timeout=2)
 
-            print(f'{ip_port}有效')
+            # print(f'{ip_port}有效')
             return ip_port
         except:
-            print(f'{ip_port}无效')
+            # print(f'{ip_port}无效')
             ws.delete_rows(i)  # 无效则删除第i行，后面数据补充上去
             book.save("C:\\Users\\Administrator\\Desktop\\代理IP.xlsx")
 
@@ -148,12 +168,52 @@ def get_excel():
 
 def main():
 
-    for i in range(1,5):   #把前四页的爬取出来
-        url = 'http://www.xiladaili.com/gaoni/'+str(i)+'/'
-        ip_list = get_ip(url)
-        ip_useful_list = check_ip(ip_list)
-        print(ip_useful_list)
-        write_excel(ip_useful_list)
+    new_ip = get_excel()
+    i = 1
+    j = 1
+    while i <=25:
+    # for i in range(1,25):   #把前四页的爬取出来
+
+        print(new_ip)
+        try:
+
+            url = 'http://www.xiladaili.com/gaoni/'+str(i)+'/'
+            ip_list = get_ip(url,new_ip)
+            print(ip_list)
+            ip_useful_list = check_ip(ip_list)
+            print(ip_useful_list)
+            if len(ip_list) == 0:
+
+                new_ip = get_excel()
+                print(f'第{i}页ip爬取出错{j}次，更换IP:{new_ip}重新爬取')
+                if j >8:
+                    print(f'出错8次，跳过第{i}页')
+                    i+=1
+                    j=0
+
+                j += 1
+
+                time.sleep(5)
+
+
+            else:
+                print(ip_useful_list)
+                write_excel(ip_useful_list)
+
+                print(f'第{i}页ip爬取写入成功')
+                i += 1
+                j = 1
+
+
+        except:
+            new_ip = get_excel()
+            print(f'第{i}页ip爬取出错{j}次，更换IP:{new_ip}重新爬取')
+            if j >8:
+                print(f'出错8次，跳过第{i}页')
+                i+=1
+                j=0
+            j+=1
+            time.sleep(5)
 
     #从exel中获取一个有效ip并返回
     ip_useful = get_excel()
