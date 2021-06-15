@@ -179,9 +179,9 @@ def main():
 
             url = 'http://www.xiladaili.com/gaoni/'+str(i)+'/'
             ip_list = get_ip(url,new_ip)
-            print(ip_list)
+            # print(ip_list)
             ip_useful_list = check_ip(ip_list)
-            print(ip_useful_list)
+            # print(ip_useful_list)
             if len(ip_list) == 0:
 
                 new_ip = get_excel()
@@ -216,8 +216,8 @@ def main():
             time.sleep(5)
 
     #从exel中获取一个有效ip并返回
-    ip_useful = get_excel()
-    print(ip_useful)
+    # ip_useful = get_excel()
+    # print(ip_useful)
 
 
 main()
