@@ -162,22 +162,34 @@ def get_excel():
     while True:
         i = random.randint(2,k)   #获取随机的一个IP
         ip_port = ws['A'+str(i)].value
-        print(ip_port)
+        # print(ip_port)
 
         url = 'http://icanhazip.com'  # 用来检测IP是否可以正常使用
         proxy = {'http':ip_port, 'https':ip_port}
         try:
             response = requests.get(url=url, proxies=proxy, timeout=2)
 
-            print(f'{ip_port}有效')
+            # print(f'{ip_port}有效')
             return ip_port
         except:
-            print(f'{ip_port}无效')
+            # print(f'{ip_port}无效')
             ws.delete_rows(i)  # 无效则删除第i行，后面数据补充上去
             book.save("C:\\Users\\Administrator\\Desktop\\代理IP.xlsx")
 
 
+def delate_ip(ip):
 
+    book = openpyxl.load_workbook('C:\\Users\\Administrator\\Desktop\\代理IP.xlsx')
+    ws = book.active  # 获取当前正在操作的表对象
+
+    strs = []
+    for key_word in ws['A']:
+        strs.append(key_word.value)
+
+    j = strs.index(ip)
+    ws.delete_rows(j)  # 无效则删除第i行，后面数据补充上去
+    book.save("C:\\Users\\Administrator\\Desktop\\代理IP.xlsx")
+    print(f'{ip}无效，删除')
 
 
 
@@ -277,8 +289,24 @@ def main():
     # print(ip_useful_list)
 
     ip = get_excel()
+    # cookie = get_in(ip)
+    m = 0
+    while True:
 
-    cookie = get_in(ip)
+        try:
+            cookie = get_in(ip)
+            break
+        except:
+            time.sleep(2)
+            m +=1
+            print(f'获取cookie失败{m}次')
+            if m >5:
+                delate_ip(ip)
+                ip = get_excel()
+                print(f'获取cookie5次失败，更换IP：{ip}')
+                m = 0
+
+
     url_list = ['https://cloud.cn2030.com/sc/wx/HandlerSubscribe.ashx?act=CustomerProduct&id=4846&lat=30.27415&lng=120.15515&key302=2b7b75179a&expire302=1623027327',
                 'https://cloud.cn2030.com/sc/wx/HandlerSubscribe.ashx?act=CustomerProduct&id=3653&lat=30.27415&lng=120.15515&key302=06da522bf2&expire302=1623028311',
                 'https://cloud.cn2030.com/sc/wx/HandlerSubscribe.ashx?act=CustomerProduct&id=4851&lat=30.27415&lng=120.15515&key302=ae9b132ff0&expire302=1623030780',
@@ -299,8 +327,6 @@ def main():
     text_all = get_time() + '\n'
 
     k = 0
-
-
 
     for url in url_list:
         # print(url)
@@ -323,9 +349,11 @@ def main():
             except:
                 print(f'查询出错了{j}次')
                 if j == 5:
+                    delate_ip(ip)
                     ip = get_excel()
                     print(f'出错5次，换新IP：{ip}')
                 elif j == 10:
+                    delate_ip(ip)
                     print('出错10次，查询下一家医院')
                 else:
                     j +=1
