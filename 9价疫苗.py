@@ -185,11 +185,11 @@ def delate_ip(ip):
     strs = []
     for key_word in ws['A']:
         strs.append(key_word.value)
-
-    j = strs.index(ip)+1   #要加1才是真实行
-    ws.delete_rows(j)  # 无效则删除第i行，后面数据补充上去
-    book.save("C:\\Users\\Administrator\\Desktop\\代理IP.xlsx")
-    print(f'{ip}无效，删除')
+    if ip in strs:
+        j = strs.index(ip)+1   #要加1才是真实行
+        ws.delete_rows(j)  # 无效则删除第i行，后面数据补充上去
+        book.save("C:\\Users\\Administrator\\Desktop\\代理IP.xlsx")
+        print(f'{ip}无效，删除')
 
 
 
