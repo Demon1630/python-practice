@@ -186,7 +186,7 @@ def delate_ip(ip):
     for key_word in ws['A']:
         strs.append(key_word.value)
 
-    j = strs.index(ip)
+    j = strs.index(ip)+1   #要加1才是真实行
     ws.delete_rows(j)  # 无效则删除第i行，后面数据补充上去
     book.save("C:\\Users\\Administrator\\Desktop\\代理IP.xlsx")
     print(f'{ip}无效，删除')
@@ -352,9 +352,16 @@ def main():
                     delate_ip(ip)
                     ip = get_excel()
                     print(f'出错5次，换新IP：{ip}')
-                elif j == 10:
+                    j += 1
+                elif j ==10:
                     delate_ip(ip)
-                    print('出错10次，查询下一家医院')
+                    ip = get_excel()
+                    print(f'出错10次，换新IP：{ip}')
+                    j += 1
+                elif j == 15:
+                    delate_ip(ip)
+                    print('出错15次，查询下一家医院')
+
                 else:
                     j +=1
                     time.sleep(2)
