@@ -367,6 +367,7 @@ def main():
                 elif j == 20:
                     delate_ip(ip)
                     print('出错20次，查询下一家医院')
+                    j+=1
 
                 else:
                     j +=1
