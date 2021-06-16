@@ -234,7 +234,7 @@ def main():
     new_ip = get_excel_ip()
     i = 1
     j = 1
-    while i <=25:
+    while i <=50:
     # for i in range(1,25):   #把前四页的爬取出来
 
         print(new_ip)
@@ -247,10 +247,11 @@ def main():
             # print(ip_useful_list)
             if len(ip_list) == 0:
 
+                delate_ip(new_ip)
                 new_ip = get_excel_ip()
                 print(f'第{i}页ip爬取出错{j}次，更换IP:{new_ip}重新爬取')
-                if j >8:
-                    print(f'出错8次，跳过第{i}页')
+                if j >20:
+                    print(f'出错20次，跳过第{i}页')
                     i+=1
                     j=0
 
@@ -269,10 +270,11 @@ def main():
 
 
         except:
+            delate_ip(new_ip)
             new_ip = get_excel_ip()
             print(f'第{i}页ip爬取出错{j}次，更换IP:{new_ip}重新爬取')
-            if j >8:
-                print(f'出错8次，跳过第{i}页')
+            if j >20:
+                print(f'出错20次，跳过第{i}页')
                 i+=1
                 j=0
             j+=1
