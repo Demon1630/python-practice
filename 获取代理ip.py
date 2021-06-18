@@ -14,6 +14,9 @@ from openpyxl import load_workbook  # 读取Excel表所用
 import openpyxl
 import random
 
+
+
+
 def get_ip(url,new_ip):
     '''
     从免费代理IP网站获取代理IP
@@ -73,7 +76,26 @@ def get_ip(url,new_ip):
 
 # get_ip('http://www.xiladaili.com/gaoni/6/','')
 
-def check_ip(ip_list):
+def check_if_ip_in_excel(ip_list):
+    # 先读取，再写入
+    book = openpyxl.load_workbook('C:\\Users\\Administrator\\Desktop\\代理IP.xlsx')
+    ws = book.active  # 获取当前正在操作的表对象
+    strs = []
+    for key_word in ws['A']:
+        strs.append(key_word.value)
+
+    useful_iplist=[]
+    for ip in ip_list:
+        if ip['ip_port'] not in strs:
+            useful_iplist.append(ip)
+            # return ip
+        else:
+            # return
+            print(f'{ip}已经存在，不检查')
+
+    return useful_iplist
+
+def check_ip(ip_list,num):
     '''
     检测IP是否有效，但在pycharm中一直返回的是本身IP，而在vps中运行时则会正常。。。不知道怎么回事
     '''
@@ -95,11 +117,17 @@ def check_ip(ip_list):
             # print(response.status_code)
             # print(response.text)
             print(f'{dic_ip}有效')
-            ip_useful_list.append(dic_ip)  # 有效则把IP添加到列表中
+            dic_ip['useful'] = 111
+            num += 1
+
         except:
             print(f'{dic_ip}无效')
+            dic_ip['useful'] = 000
             # continue
-    return ip_useful_list
+            num = num
+
+        ip_useful_list.append(dic_ip)  # 把IP添加到列表中,是否有效通过useful来标记
+    return ip_useful_list,num
 
 
 def write_excel(list):
@@ -110,30 +138,32 @@ def write_excel(list):
 
     #把ip提取出来,判断是否存在
 
-    strs = []
-    for key_word in ws['A']:
-        strs.append(key_word.value)
+    # strs = []
+    # for key_word in ws['A']:
+    #     strs.append(key_word.value)
 
     j = ws.max_row  #获取行数，添加到后面去，就不会把前面的覆盖掉
     for ip_info in list:
-        ip_port = ip_info['ip_port']
-        if ip_port not in strs:
-            print(f'{ip_info}  不存在,存入')
+        # ip_port = ip_info['ip_port']
+        # if ip_port not in strs:
+        # print(f'{ip_info}  不存在,存入')
             # text = list[0] + '  ' + list[1] + '  ' + list[2] + '\n'
             # send_telegram(text)    #关键词之前不存在,则推送并添加进去
             # ws.append(ip_info)   #不能直接写进去，要先读取字典
 
-            j += 1
+        j += 1
             # for item in ip_info.items():
             # j +=1
-            ws['A'+str(j)].value=ip_info['ip_port']
-            ws['B'+str(j)].value=ip_info['tpy']
-            ws['C'+str(j)].value=ip_info['time_yanchi']
-            ws['D'+str(j)].value=ip_info['core']
+        ws['A'+str(j)].value=ip_info['ip_port']
+        ws['B'+str(j)].value=ip_info['tpy']
+        ws['C'+str(j)].value=ip_info['time_yanchi']
+        ws['D'+str(j)].value=ip_info['core']
+        ws['E'+str(j)].value=ip_info['useful']
 
 
-            book.save("C:\\Users\\Administrator\\Desktop\\代理IP.xlsx")
+        book.save("C:\\Users\\Administrator\\Desktop\\代理IP.xlsx")
             # print(f'{ip_port}写入成功')
+
 
 
 
@@ -148,21 +178,25 @@ def get_excel_ip():
 
     k = ws.max_row
     while True:
-        i = random.randint(2,k)
-        ip_port = ws['A'+str(i)].value
-        # print(ip_port)
+        i = random.randint(1,k)     #获取随机一行IP
+        if ws['E'+str(i)].value == 111:       #先通过useful这个值来判断是否有效，有效则再来检测
+            ip_port = ws['A'+str(i)].value
+            # print(ip_port)
 
-        url = 'http://icanhazip.com'  # 用来检测IP是否可以正常使用
-        proxy = {'http':ip_port, 'https':ip_port}
-        try:
-            response = requests.get(url=url, proxies=proxy, timeout=2)
+            url = 'http://icanhazip.com'  # 用来检测IP是否可以正常使用
+            proxy = {'http':ip_port, 'https':ip_port}
+            try:
+                response = requests.get(url=url, proxies=proxy, timeout=2)
 
-            # print(f'{ip_port}有效')
-            return ip_port
-        except:
-            # print(f'{ip_port}无效')
-            ws.delete_rows(i)  # 无效则删除第i行，后面数据补充上去
-            book.save("C:\\Users\\Administrator\\Desktop\\代理IP.xlsx")
+                # print(f'{ip_port}有效')
+                return ip_port
+            except:
+                # print(f'{ip_port}无效')
+                ws['E' + str(i)].value = 000
+                # ws.delete_rows(i)  # 无效则删除第i行，后面数据补充上去    #不删除
+                book.save("C:\\Users\\Administrator\\Desktop\\代理IP.xlsx")
+
+
 
 def delate_ip(ip):
 
@@ -174,9 +208,10 @@ def delate_ip(ip):
         strs.append(key_word.value)
     if ip in strs:
         j = strs.index(ip)+1
-        ws.delete_rows(j)  # 无效则删除第i行，后面数据补充上去
+        ws['E' + str(j)].value = 000
+        # ws.delete_rows(j)  # 无效则删除第i行，后面数据补充上去
         book.save("C:\\Users\\Administrator\\Desktop\\代理IP.xlsx")
-        print(f'{ip}无效，删除')
+        print(f'{ip}无效,重新标记')
 
 
 def send_wechat(title,text,detal_url):
@@ -229,11 +264,20 @@ def send_telegram(text):
 
     bot.send_message(chat_id=chat_id, text=text)
 
+def get_time():
+    # 格式化成2016-03-20 11:45:39形式
+    real_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+    # print (real_time)
+    return real_time
+
 def main():
 
     new_ip = get_excel_ip()
     i = 1
     j = 1
+
+    start_time = time.time()
+    num = 0
     while i <=50:
     # for i in range(1,25):   #把前四页的爬取出来
 
@@ -241,11 +285,11 @@ def main():
         try:
 
             url = 'http://www.xiladaili.com/gaoni/'+str(i)+'/'
-            ip_list = get_ip(url,new_ip)
+            ip_list = get_ip(url,new_ip)   #先爬取IP
             # print(ip_list)
-            ip_useful_list = check_ip(ip_list)
+
             # print(ip_useful_list)
-            if len(ip_list) == 0:
+            if len(ip_list) == 0:    #判断是否爬取到了
 
                 delate_ip(new_ip)
                 new_ip = get_excel_ip()
@@ -254,19 +298,23 @@ def main():
                     print(f'出错20次，跳过第{i}页')
                     i+=1
                     j=0
-
                 j += 1
-
                 time.sleep(5)
-
-
+                num = num
             else:
+                ip_notin_excel_list = check_if_ip_in_excel(ip_list)   #先判断IP是否存在于excel中，把不存在的输出来
+                get_touple = check_ip(ip_notin_excel_list,num)    #然后判断是否有效
+                ip_useful_list = get_touple[0]     #然后判断是否有效
+                num_old = get_touple[1]
+
                 print(ip_useful_list)
                 write_excel(ip_useful_list)
 
                 print(f'第{i}页ip爬取写入成功')
                 i += 1
                 j = 1
+                num = num_old
+
 
 
         except:
@@ -279,9 +327,24 @@ def main():
                 j=0
             j+=1
             time.sleep(5)
+            num = num
 
-    send_wechat('IP池爬取', '爬取完成', 'URL')
-    send_telegram('IP池爬取完成')
+
+
+    #添加计算采集时间功能
+    end_time = time.time()
+    seconds = int(end_time - start_time)
+    m, s = divmod(seconds, 60)
+    h, m = divmod(m, 60)
+    time_used = "%d:%02d:%02d" % (h, m, s)
+
+    # print("%d:%02d:%02d" % (h, m, s))
+
+    send_text = '爬取完成,用时'+str(time_used)+',共采集了'+str(num)+'个有效IP'
+
+    print(send_text)
+    send_wechat('IP池爬取', send_text, 'URL')
+    send_telegram(send_text)
 
     #从exel中获取一个有效ip并返回
     # ip_useful = get_excel()
