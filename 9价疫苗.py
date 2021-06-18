@@ -180,6 +180,9 @@ def get_excel():
                 # ws.delete_rows(i)  # 无效则删除第i行，后面数据补充上去    #不删除
                 book.save("C:\\Users\\Administrator\\Desktop\\代理IP.xlsx")
 
+        else:
+            print(f"{ws['A'+str(i)].value}标记为无效，重新获取")
+
 
 
 def delate_ip(ip):
