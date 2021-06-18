@@ -149,6 +149,8 @@ def get_ip():
 '''
 
 
+
+
 def get_excel():
     '''
     从excle文件中随机读取一个ip，然后判断是否有效，并输出
@@ -160,21 +162,24 @@ def get_excel():
 
     k = ws.max_row
     while True:
-        i = random.randint(2,k)   #获取随机的一个IP
-        ip_port = ws['A'+str(i)].value
-        # print(ip_port)
+        i = random.randint(1,k)     #获取随机一行IP
+        if ws['E'+str(i)].value == 111:       #先通过useful这个值来判断是否有效，有效则再来检测
+            ip_port = ws['A'+str(i)].value
+            # print(ip_port)
 
-        url = 'http://icanhazip.com'  # 用来检测IP是否可以正常使用
-        proxy = {'http':ip_port, 'https':ip_port}
-        try:
-            response = requests.get(url=url, proxies=proxy, timeout=2)
+            url = 'http://icanhazip.com'  # 用来检测IP是否可以正常使用
+            proxy = {'http':ip_port, 'https':ip_port}
+            try:
+                response = requests.get(url=url, proxies=proxy, timeout=2)
 
-            # print(f'{ip_port}有效')
-            return ip_port
-        except:
-            # print(f'{ip_port}无效')
-            ws.delete_rows(i)  # 无效则删除第i行，后面数据补充上去
-            book.save("C:\\Users\\Administrator\\Desktop\\代理IP.xlsx")
+                # print(f'{ip_port}有效')
+                return ip_port
+            except:
+                # print(f'{ip_port}无效')
+                ws['E' + str(i)].value = 000
+                # ws.delete_rows(i)  # 无效则删除第i行，后面数据补充上去    #不删除
+                book.save("C:\\Users\\Administrator\\Desktop\\代理IP.xlsx")
+
 
 
 def delate_ip(ip):
@@ -186,10 +191,11 @@ def delate_ip(ip):
     for key_word in ws['A']:
         strs.append(key_word.value)
     if ip in strs:
-        j = strs.index(ip)+1   #要加1才是真实行
-        ws.delete_rows(j)  # 无效则删除第i行，后面数据补充上去
+        j = strs.index(ip)+1
+        ws['E' + str(j)].value = 000
+        # ws.delete_rows(j)  # 无效则删除第i行，后面数据补充上去
         book.save("C:\\Users\\Administrator\\Desktop\\代理IP.xlsx")
-        print(f'{ip}无效，删除')
+        print(f'{ip}无效,重新标记')
 
 
 
@@ -210,7 +216,7 @@ def get_in(ip):
 
     }
 
-    response = requests.get(url=url,headers=headers,proxies=proxy)
+    response = requests.get(url=url,headers=headers,proxies=proxy,timeout = 5)
 
     print(response.status_code)
     # print(response.headers)
@@ -242,7 +248,7 @@ def get_info(url,cookie,k,ip):
 
     }
 
-    response = requests.get(url=url,headers=headers,proxies=proxy)
+    response = requests.get(url=url,headers=headers,proxies=proxy,timeout=5)
     # print(response.status_code)
     # print(response.text)
     info = eval(str(response.text.replace('true','111').replace('false','000')))
@@ -327,7 +333,7 @@ def main():
     text_all = get_time() + '\n'
 
     k = 0
-
+    num = 0
     for url in url_list:
         # print(url)
         j = 1
@@ -367,6 +373,7 @@ def main():
                 elif j == 20:
                     delate_ip(ip)
                     print('出错20次，查询下一家医院')
+                    num +=1
                     j+=1
 
                 else:
@@ -381,8 +388,8 @@ def main():
 
     if k == 32:
         print('暂时都不可预约')
-        send_wechat('九价疫苗',f'{get_time()} hpv疫苗暂时都不可预约','URL')
-        send_telegram(f'{get_time()}  hpv疫苗暂时都不可预约')
+        send_wechat('九价疫苗',f'{get_time()} hpv疫苗暂时都不可预约,其中{num}家医院查询错误','URL')
+        send_telegram(f'{get_time()}  hpv疫苗暂时都不可预约,其中{num}家医院查询错误')
     else:
         print('有疫苗可预约')
         send_wechat('九价疫苗',f'{get_time()} hpv疫苗有可以预约的了，快去准备预约','URL')
