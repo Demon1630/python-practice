@@ -17,7 +17,7 @@ import random
 
 
 
-def get_ip(url,new_ip):
+def get_xila_ip(url,new_ip):
     '''
     从免费代理IP网站获取代理IP
     '''
@@ -70,8 +70,78 @@ def get_ip(url,new_ip):
         ip_list.append(dic)    #用字典形式存入列表中
 
         # print(f'ip和端口：{ip_port},类型：{tpy},响应时间：{time_yanchi},分数：{core}')
-    # print(ip_list)
+    print(ip_list)
+    if len(ip_list) != 0:
+        print('xiladaili爬取成功')
+    else:
+        print('xiladaili爬取失败')
+
     return ip_list   #将获取到的IP列表返回
+
+
+def get_kuaidaili_ip(url):
+    '''
+    从免费代理IP网站获取代理IP
+    '''
+
+    # url = 'http://www.xiladaili.com/gaoni/'
+
+    headers= {
+        # 'User-Agent': UserAgent().random
+        'Accept':'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
+        'Accept-Encoding':'gzip,deflate,br',
+        'Accept-Language':'zh-CN,zh;q=0.9,zh-TW;q=0.8,en;q=0.7',
+        'Cache-Control':'max-age=0',
+        'Connection':'keep-alive',
+        'cookie':'channelid=0; sid=1623726223825649; _ga=GA1.2.1408876963.1623727124; _gcl_au=1.1.573137817.1624064417; _gid=GA1.2.1635708697.1624064417; Hm_lvt_7ed65b1cc4b810e9fd37959c9bb51b31=1624064417; Hm_lpvt_7ed65b1cc4b810e9fd37959c9bb51b31=1624064417',
+        'DNT': '1',
+        'Host': 'www.kuaidaili.com',
+        'Referer':'https://www.google.com/',
+        'sec-ch-ua':'" Not;A Brand";v="99", "Google Chrome";v="91", "Chromium";v="91"',
+        'Upgrade-Insecure-Requests': '1',
+        'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.101 Safari/537.36',
+
+    }
+
+    # proxy = {'http': new_ip, 'https': new_ip}
+
+    respons = requests.get(url=url,headers=headers)#,proxies= proxy)
+
+    # print(respons.status_code)
+    # print(respons.text)
+
+    bs =BeautifulSoup(respons.content,'html.parser')
+    info = bs.find('tbody')
+    # print(info)
+    data = info.find_all('tr')
+    # print(data)
+
+    ip_list=[]   #将获取到的IP用列表存储
+    for i in data:
+        dic = {}
+        ip = i.find_all('td')[0].string          #拆分IP和端口
+        port = i.find_all('td')[1].string          #拆分IP和端口
+        tpy = i.find_all('td')[3].string              #拆分类型 http或https
+        time_yanchi = i.find_all('td')[5].string      #响应时间
+        core = i.find_all('td')[6].string             #打分
+
+
+        # if tpy != 'HTTP代理':           #把https存起来，因为使用中主要还是使用https
+        dic['ip_port']=ip+':'+port
+        dic['tpy']=tpy
+        dic['time_yanchi']=time_yanchi
+        dic['core']=core
+
+        ip_list.append(dic)    #用字典形式存入列表中
+
+        # print(f'ip和端口：{ip_port},类型：{tpy},响应时间：{time_yanchi},分数：{core}')
+    print(ip_list)
+    if len(ip_list) != 0:
+        print('kuaidaili爬取成功')
+    else:
+        print('kuaidaili爬取失败')
+    return ip_list   #将获取到的IP列表返回
+
 
 
 # get_ip('http://www.xiladaili.com/gaoni/6/','')
@@ -225,7 +295,7 @@ def send_wechat(title,text,detal_url):
 
 
     url = f'https://qyapi.weixin.qq.com/cgi-bin/message/send?access_token={access_token}'
-    print(url)
+    # print(url)
 
     headers = {
         'User-Agent': UserAgent().random
@@ -278,15 +348,22 @@ def main():
 
     start_time = time.time()
     num = 0
-    while i <=50:
+    while i <=5:
     # for i in range(1,25):   #把前四页的爬取出来
 
         print(new_ip)
         try:
 
-            url = 'http://www.xiladaili.com/gaoni/'+str(i)+'/'
-            ip_list = get_ip(url,new_ip)   #先爬取IP
+            url1 = 'http://www.xiladaili.com/gaoni/'+str(i)+'/'
+            url2 = 'https://www.kuaidaili.com/free/intr/'+str(i)+'/'
+            ip_list1 = get_xila_ip(url1,new_ip)   #先爬取IP
+            ip_list2 = get_kuaidaili_ip(url2)   #先爬取IP
             # print(ip_list)
+
+            # ip_list = ip_list2
+            ip_list = ip_list1 + ip_list2
+            # print(ip_list)
+
 
             # print(ip_useful_list)
             if len(ip_list) == 0:    #判断是否爬取到了
@@ -307,7 +384,7 @@ def main():
                 ip_useful_list = get_touple[0]     #然后判断是否有效
                 num_old = get_touple[1]
 
-                print(ip_useful_list)
+                # print(ip_useful_list)
                 write_excel(ip_useful_list)
 
                 print(f'第{i}页ip爬取写入成功')
