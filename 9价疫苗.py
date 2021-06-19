@@ -170,7 +170,8 @@ def get_excel():
             url = 'http://icanhazip.com'  # 用来检测IP是否可以正常使用
             proxy = {'http':ip_port, 'https':ip_port}
             try:
-                response = requests.get(url=url, proxies=proxy, timeout=2)
+                response = requests.get(url=url, proxies=proxy, timeout=5)
+
 
                 # print(f'{ip_port}有效')
                 return ip_port
@@ -219,7 +220,7 @@ def get_in(ip):
 
     }
 
-    response = requests.get(url=url,headers=headers,proxies=proxy,timeout = 5)
+    response = requests.get(url=url,headers=headers,proxies=proxy)
 
     print(response.status_code)
     # print(response.headers)
@@ -251,7 +252,7 @@ def get_info(url,cookie,k,ip):
 
     }
 
-    response = requests.get(url=url,headers=headers,proxies=proxy,timeout=5)
+    response = requests.get(url=url,headers=headers,proxies=proxy)
     # print(response.status_code)
     # print(response.text)
     info = eval(str(response.text.replace('true','111').replace('false','000')))
