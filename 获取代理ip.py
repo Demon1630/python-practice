@@ -48,35 +48,40 @@ def get_xila_ip(url,new_ip):
 
     bs =BeautifulSoup(respons.content,'html.parser')
     info = bs.find('tbody')
-    # print(info)
-    data = info.find_all('tr')
-    # print(data)
-
-    ip_list=[]   #将获取到的IP用列表存储
-    for i in data:
-        dic = {}
-        ip_port = i.find_all('td')[0].string          #拆分IP和端口
-        tpy = i.find_all('td')[1].string              #拆分类型 http或https
-        time_yanchi = i.find_all('td')[4].string      #响应时间
-        core = i.find_all('td')[7].string             #打分
-
-
-        # if tpy != 'HTTP代理':           #把https存起来，因为使用中主要还是使用https
-        dic['ip_port']=ip_port
-        dic['tpy']=tpy
-        dic['time_yanchi']=time_yanchi
-        dic['core']=core
-
-        ip_list.append(dic)    #用字典形式存入列表中
-
-        # print(f'ip和端口：{ip_port},类型：{tpy},响应时间：{time_yanchi},分数：{core}')
-    print(ip_list)
-    if len(ip_list) != 0:
-        print('xiladaili爬取成功')
-    else:
+    if info is None:
         print('xiladaili爬取失败')
+        return []
+    else:
 
-    return ip_list   #将获取到的IP列表返回
+        # print(info)
+        data = info.find_all('tr')
+        # print(data)
+
+        ip_list=[]   #将获取到的IP用列表存储
+        for i in data:
+            dic = {}
+            ip_port = i.find_all('td')[0].string          #拆分IP和端口
+            tpy = i.find_all('td')[1].string              #拆分类型 http或https
+            time_yanchi = i.find_all('td')[4].string      #响应时间
+            core = i.find_all('td')[7].string             #打分
+
+
+            # if tpy != 'HTTP代理':           #把https存起来，因为使用中主要还是使用https
+            dic['ip_port']=ip_port
+            dic['tpy']=tpy
+            dic['time_yanchi']=time_yanchi
+            dic['core']=core
+
+            ip_list.append(dic)    #用字典形式存入列表中
+
+            # print(f'ip和端口：{ip_port},类型：{tpy},响应时间：{time_yanchi},分数：{core}')
+        # print(ip_list)
+        if len(ip_list) != 0:
+            print('xiladaili爬取成功')
+        else:
+            print('xiladaili爬取失败')
+
+        return ip_list   #将获取到的IP列表返回
 
 
 def get_kuaidaili_ip(url):
@@ -112,35 +117,39 @@ def get_kuaidaili_ip(url):
 
     bs =BeautifulSoup(respons.content,'html.parser')
     info = bs.find('tbody')
-    # print(info)
-    data = info.find_all('tr')
-    # print(data)
-
-    ip_list=[]   #将获取到的IP用列表存储
-    for i in data:
-        dic = {}
-        ip = i.find_all('td')[0].string          #拆分IP和端口
-        port = i.find_all('td')[1].string          #拆分IP和端口
-        tpy = i.find_all('td')[3].string              #拆分类型 http或https
-        time_yanchi = i.find_all('td')[5].string      #响应时间
-        core = i.find_all('td')[6].string             #打分
-
-
-        # if tpy != 'HTTP代理':           #把https存起来，因为使用中主要还是使用https
-        dic['ip_port']=ip+':'+port
-        dic['tpy']=tpy
-        dic['time_yanchi']=time_yanchi
-        dic['core']=core
-
-        ip_list.append(dic)    #用字典形式存入列表中
-
-        # print(f'ip和端口：{ip_port},类型：{tpy},响应时间：{time_yanchi},分数：{core}')
-    print(ip_list)
-    if len(ip_list) != 0:
-        print('kuaidaili爬取成功')
+    if info is None:
+        print('xiladaili爬取失败')
+        return []
     else:
-        print('kuaidaili爬取失败')
-    return ip_list   #将获取到的IP列表返回
+        # print(info)
+        data = info.find_all('tr')
+        # print(data)
+
+        ip_list=[]   #将获取到的IP用列表存储
+        for i in data:
+            dic = {}
+            ip = i.find_all('td')[0].string          #拆分IP和端口
+            port = i.find_all('td')[1].string          #拆分IP和端口
+            tpy = i.find_all('td')[3].string              #拆分类型 http或https
+            time_yanchi = i.find_all('td')[5].string      #响应时间
+            core = i.find_all('td')[6].string             #打分
+
+
+            # if tpy != 'HTTP代理':           #把https存起来，因为使用中主要还是使用https
+            dic['ip_port']=ip+':'+port
+            dic['tpy']=tpy
+            dic['time_yanchi']=time_yanchi
+            dic['core']=core
+
+            ip_list.append(dic)    #用字典形式存入列表中
+
+            # print(f'ip和端口：{ip_port},类型：{tpy},响应时间：{time_yanchi},分数：{core}')
+        # print(ip_list)
+        if len(ip_list) != 0:
+            print('kuaidaili爬取成功')
+        else:
+            print('kuaidaili爬取失败')
+        return ip_list   #将获取到的IP列表返回
 
 
 
@@ -243,11 +252,13 @@ def get_excel_ip():
     :return:
     '''
 
-    book = openpyxl.load_workbook('C:\\Users\\Administrator\\Desktop\\代理IP.xlsx')
-    ws = book.active  # 获取当前正在操作的表对象
 
-    k = ws.max_row
     while True:
+        book = openpyxl.load_workbook('C:\\Users\\Administrator\\Desktop\\代理IP.xlsx')
+        ws = book.active  # 获取当前正在操作的表对象
+
+        k = ws.max_row
+
         i = random.randint(1,k)     #获取随机一行IP
         if ws['E'+str(i)].value == 111:       #先通过useful这个值来判断是否有效，有效则再来检测
             ip_port = ws['A'+str(i)].value
@@ -259,6 +270,7 @@ def get_excel_ip():
                 response = requests.get(url=url, proxies=proxy, timeout=2)
 
                 # print(f'{ip_port}有效')
+                book.save("C:\\Users\\Administrator\\Desktop\\代理IP.xlsx")
                 return ip_port
             except:
                 # print(f'{ip_port}无效')
@@ -282,6 +294,9 @@ def delate_ip(ip):
         # ws.delete_rows(j)  # 无效则删除第i行，后面数据补充上去
         book.save("C:\\Users\\Administrator\\Desktop\\代理IP.xlsx")
         print(f'{ip}无效,重新标记')
+
+    else:
+        book.save("C:\\Users\\Administrator\\Desktop\\代理IP.xlsx")
 
 
 def send_wechat(title,text,detal_url):
@@ -366,11 +381,11 @@ def main():
 
 
             # print(ip_useful_list)
-            if len(ip_list) == 0:    #判断是否爬取到了
+            if len(ip_list1) == 0 or len(ip_list2) ==0:    #判断是否爬取到了
 
                 delate_ip(new_ip)
                 new_ip = get_excel_ip()
-                print(f'第{i}页ip爬取出错{j}次，更换IP:{new_ip}重新爬取')
+                print(f'两个IP池第{i}页ip爬取出错{j}次，更换IP:{new_ip}重新爬取')
                 if j >20:
                     print(f'出错20次，跳过第{i}页')
                     i+=1
@@ -378,6 +393,17 @@ def main():
                 j += 1
                 time.sleep(5)
                 num = num
+
+            elif len(ip_list1) == 0 or len(ip_list2) == 0:
+                print(f'某一IP池第{i}页ip爬取出错{j}次，更换IP:{new_ip}重新爬取')
+                if j > 20:
+                    print(f'出错20次，跳过第{i}页')
+                    i += 1
+                    j = 0
+                j += 1
+                time.sleep(5)
+                num = num
+
             else:
                 ip_notin_excel_list = check_if_ip_in_excel(ip_list)   #先判断IP是否存在于excel中，把不存在的输出来
                 get_touple = check_ip(ip_notin_excel_list,num)    #然后判断是否有效
