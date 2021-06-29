@@ -81,6 +81,7 @@ def send_telegram(text):
     token = '1756504990:AAHyJcj1GZSDWYnrrm3a0i22dXU76q7_mtE'
     bot = telegram.Bot(token=token)
 
+
     bot.send_message(chat_id=chat_id, text=text)
 
 
