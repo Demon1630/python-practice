@@ -6,25 +6,93 @@ import requests
 from bs4 import BeautifulSoup
 from  fake_useragent import UserAgent
 import os
+import datetime
+
+from selenium import webdriver
+import time
+from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.common.by import By
+from selenium.webdriver.common.action_chains import ActionChains
+
+driver = webdriver.Chrome()
 
 
 
+def get_cookie():
+
+    url = 'https://webvpn.nankai.edu.cn/https/77726476706e69737468656265737421e3e44ed22931665b7f01c7a99c406d3635/sso/login?service=https%3A%2F%2Fwebvpn.nankai.edu.cn%2Flogin%3Fcas_login%3Dtrue'
+
+    driver.get(url)
+    time.sleep(3)
+
+    #填入名称和密码
+    name = driver.find_element_by_xpath('/html/body/div/div[2]/div[1]/div[2]/ul/li[2]/input')
+    name.send_keys('1120210985')
+    pw = driver.find_element_by_xpath('/html/body/div/div[2]/div[1]/div[2]/ul/li[3]/input')
+    pw.send_keys('Xyh0945')
+
+    #移动滑块
+    action = ActionChains(driver)
+    source=driver.find_element_by_xpath("/html/body/div/div[2]/div[1]/div[2]/ul/li[4]/div/div/div")#需要滑动的元素
+    action.click_and_hold(source).perform()  #鼠标左键按下不放
+    action.move_by_offset(250,0)#需要滑动的坐标
+    action.release().perform() #释放鼠标
+    time.sleep(2)
+
+    #登入点击
+    log_in = driver.find_element_by_xpath('/html/body/div/div[2]/div[1]/div[2]/ul/li[9]')
+    html_get = log_in.click()
+
+    time.sleep(10)
+
+    #获取cookie
+    c = driver.get_cookies()
+
+    # print(type(c))
+    # print(len(c))
+
+    # print(type(c[1]))
+    cookie = c[1]['value']
+    # print(cookie)
+
+    url2 = 'https://webvpn.nankai.edu.cn/https/77726476706e69737468656265737421fcfe4395247e6651700388a5d6502720c6dba7/clientweb/xcus/ic2/Default.aspx'
+
+    driver.get(url2)
+
+    time.sleep(5)
+    driver.quit()
+    return cookie
+
+    # for i in c:
+    #     print(i)
 
 
-def get_in():
-    url = 'https://webvpn.nankai.edu.cn/https/77726476706e69737468656265737421fcfe4395247e6651700388a5d6502720c6dba7/clientweb/xcus/ic2/Default.aspx'
+def get_time():
+    day = datetime.datetime.now() + datetime.timedelta(days=1)#.strftime("%Y-%m-%d %H:%M:%S")
+    time1 = str(day)[:10]
+    return time1
 
+
+
+'''
+
+
+def get_in(cookie):
+    # url = 'https://webvpn.nankai.edu.cn/https/77726476706e69737468656265737421fcfe4395247e6651700388a5d6502720c6dba7/clientweb/xcus/ic2/Default.aspx'
+    url='https://webvpn.nankai.edu.cn/https/77726476706e69737468656265737421fcfe4395247e6651700388a5d6502720c6dba7/clientweb/xcus/ic2/Default.aspx'
     headers = {
         # 'User-Agent':UserAgent().random,
         'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
         'Accept-Encoding': 'gzip, deflate, br',
         'Accept-Language': 'zh-CN,zh;q=0.9,zh-TW;q=0.8,en;q=0.7',
+        'Cache-Control': 'max-age=0',
         'Connection': 'keep-alive',
-        'Cookie': 'show_vpn=0; refresh=1; wengine_vpn_ticketwebvpn_nankai_edu_cn=b351c4893f40b96c',
-        'DNT': '1',
+        # 'Cookie': 'show_vpn=0; refresh=1; wengine_vpn_ticketwebvpn_nankai_edu_cn=b351c4893f40b96c',
+        'Cookie': cookie,
+        # 'DNT': '1',
         'Host': 'webvpn.nankai.edu.cn',
         'Referer': 'https://webvpn.nankai.edu.cn/https/77726476706e69737468656265737421fcfe43d22931665b7f01c7a99c406d361d/12060/list.htm',
-        'sec-ch-ua': '"Chromium";v="94", "Google Chrome";v="94", ";Not A Brand";v="99"',
+        'sec-ch-ua': '"Google Chrome";v="95", "Chromium";v="95", ";Not A Brand";v="99"',
         'sec-ch-ua-mobile': '?0',
         'sec-ch-ua-platform': "Windows",
         'Sec-Fetch-Dest': 'document',
@@ -32,7 +100,7 @@ def get_in():
         'Sec-Fetch-Site': 'same-origin',
         'Sec-Fetch-User': '?1',
         'Upgrade-Insecure-Requests': '1',
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/94.0.4606.81 Safari/537.36',
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Safari/537.36',
     }
 
     response = requests.get(url=url, headers=headers)
@@ -46,53 +114,52 @@ def get_in():
 
 
 
-def yuyue():
-    url = 'https://webvpn.nankai.edu.cn/wengine-vpn/input'
+
+def yuyue(cookie):
+    url = 'https://webvpn.nankai.edu.cn/https/77726476706e69737468656265737421fcfe43d22931665b7f01c7a99c406d361d/12060/list.htm'
 
     headers = {
-        'Accept':'*/*',
+        'Accept':'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
         'Accept-Encoding':'gzip, deflate, br',
-        'Accept-Language':'zh-CN,zh;q=0.9,zh-TW;q=0.8,en;q=0.7',
+        'Accept-Language':'zh-CN,zh;q=0.9',
+        'Cache-Control': 'max-age=0',
         'Connection':'keep-alive',
-        'Content-Length':'44',
-        'Content-Type':'text/plain;charset=UTF-8',
-        'Cookie':'show_vpn=0;refresh=1;wengine_vpn_ticketwebvpn_nankai_edu_cn=b351c4893f40b96c',
-        'DNT':'1',
+        'Cookie':cookie,
         'Host':'webvpn.nankai.edu.cn',
         'Origin':'https://webvpn.nankai.edu.cn',
-        'Referer':'https://webvpn.nankai.edu.cn/https/77726476706e69737468656265737421fcfe4395247e6651700388a5d6502720c6dba7/clientweb/xcus/ic2/Default.aspx',
-        'sec-ch-ua':'"Chromium";v="94", "Google Chrome";v="94", ";Not A Brand";v="99"',
+        # 'Referer':'https://webvpn.nankai.edu.cn/https/77726476706e69737468656265737421fcfe4395247e6651700388a5d6502720c6dba7/clientweb/xcus/ic2/Default.aspx',
+        'Referer':'https://webvpn.nankai.edu.cn/https/77726476706e69737468656265737421fcfe43d22931665b7f01c7a99c406d361d/',
+        'sec-ch-ua':'"Google Chrome";v="95", "Chromium";v="95", ";Not A Brand";v="99"',
         'sec-ch-ua-mobile':'?0',
         'sec-ch-ua-platform':"Windows",
-        'Sec-Fetch-Dest':'empty',
-        'Sec-Fetch-Mode': 'cors',
+        'Sec-Fetch-Dest':'document',
+        'Sec-Fetch-Mode': 'navigate',
         'Sec-Fetch-Site': 'same-origin',
+        'Sec-Fetch-User': '?1',
+        'Upgrade-Insecure-Requests': '1',
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/94.0.4606.81 Safari/537.36',
 
     }
 
-    key = {
-        # 'name': "",
-        # 'type': "button",
-        # 'value': "提交",
 
-        'name': "start_time",
-        'type': "select-one",
-        'value': "1100",
-
-
-    }
-
-    response = requests.post(url=url,headers=headers,json=key)
+    response = requests.get(url=url,headers=headers)
 
     print(response.status_code)
-    print(response.text)
+    # print(response.text)
 
 
+'''
 
 
-def chaxun():
-    url = 'https://webvpn.nankai.edu.cn/https/77726476706e69737468656265737421fcfe4395247e6651700388a5d6502720c6dba7/ClientWeb/pro/ajax/reserve.aspx?vpn-12-o2-libic.nankai.edu.cn&dialogid=&dev_id=919544&lab_id=&kind_id=&room_id=&type=dev&prop=&test_id=&term=&number=&classkind=&test_name=&start=2021-11-14+10:20&end=2021-11-14+12:00&start_time=1020&end_time=1200&up_file=&memo=&act=set_resv&_=1636823486720'
+def chaxun(cookie):
+
+    time_data = get_time()
+
+    print(time_data)
+    zuowei_id=919557  #F4C031
+
+    # url = 'https://webvpn.nankai.edu.cn/https/77726476706e69737468656265737421fcfe4395247e6651700388a5d6502720c6dba7/ClientWeb/pro/ajax/reserve.aspx?vpn-12-o2-libic.nankai.edu.cn&dialogid=&dev_id=919576&lab_id=&kind_id=&room_id=&type=dev&prop=&test_id=&term=&number=&classkind=&test_name=&start=2021-11-17+09:00&end=2021-11-17+23:00&start_time=0900&end_time=2300&up_file=&memo=&act=set_resv&_=1636860448197'
+    url = 'https://webvpn.nankai.edu.cn/https/77726476706e69737468656265737421fcfe4395247e6651700388a5d6502720c6dba7/ClientWeb/pro/ajax/reserve.aspx?vpn-12-o2-libic.nankai.edu.cn&dialogid=&dev_id=919576&lab_id=&kind_id=&room_id=&type=dev&prop=&test_id=&term=&number=&classkind=&test_name=&start='+time_data+'+09:00&end='+time_data+'+23:00&start_time=0900&end_time=2300&up_file=&memo=&act=set_resv&_=1636860448197'
 
     headers={
 
@@ -100,7 +167,13 @@ def chaxun():
         'Accept-Encoding': 'gzip, deflate, br',
         'Accept-Language': 'zh-CN,zh;q=0.9,zh-TW;q=0.8,en;q=0.7',
         'Connection': 'keep-alive',
-        'Cookie': 'show_vpn=0;refresh=1;wengine_vpn_ticketwebvpn_nankai_edu_cn=b351c4893f40b96c',
+        # 'Cookie': 'show_vpn=0;refresh=1;wengine_vpn_ticketwebvpn_nankai_edu_cn=f7fa2789652709eb',
+        # 'Cookie': 'show_vpn=0;refresh=1;wengine_vpn_ticketwebvpn_nankai_edu_cn=3de91e51494c801f',
+        'Cookie': cookie,
+
+        # 'Cookie':cookie,    #c37379f2d6d8ee08',
+
+
         'DNT': '1',
         'Host': 'webvpn.nankai.edu.cn',
         'Referer': 'https://webvpn.nankai.edu.cn/https/77726476706e69737468656265737421fcfe4395247e6651700388a5d6502720c6dba7/clientweb/xcus/ic2/Default.aspx',
@@ -114,11 +187,17 @@ def chaxun():
         'X-Requested-With': 'XMLHttpRequest',
     }
 
+
     key = {
 
         'vpn-12-o2-libic.nankai.edu.cn':'',
         'dialogid':'',
-        'dev_id': '919544',
+        # 'dev_id': '919557',#F4C013
+        # 'dev_id': '919578',#F4C033
+
+        'dev_id': zuowei_id,  # F4C031
+        # 'dev_id': '919551',#F4C007
+
         'lab_id':'',
         'kind_id':'',
         'room_id':'',
@@ -129,26 +208,88 @@ def chaxun():
         'number':'',
         'classkind':'',
         'test_name':'',
-        'start': '2021-11-15 10:20',
-        'end': '2021-11-15  12:00',
-        'start_time': '1020',
-        'end_time': '1200',
+        'start': '2021-11-17 09:00',
+        'end': '2021-11-17  23:00',
+        'start_time': '0900',
+        'end_time': '2300',
         'up_file':'',
         'memo':'',
         'act': 'set_resv',
-        '_': '1636823486720',
+        # '_': '1636823486720',
+        '_': '1636860448197',
 
     }
 
-    response = requests.get(url=url,headers=headers,json=key)
+    response = requests.get(url=url, headers=headers)#,json=key)
 
     print(response.status_code)
     print(response.text)
 
+'''
+def check_cookie(cookie):
+
+    url = 'https://webvpn.nankai.edu.cn/'
+
+    headers = {
+    'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
+    'Accept-Encoding': 'gzip, deflate, br',
+    'Accept-Language':'zh-CN,zh;q=0.9',
+    'Connection': 'keep - alive',
+    # 'Cookie': cookie,
+    'Host': 'webvpn.nankai.edu.cn',
+    'Referer': 'https://webvpn.nankai.edu.cn/https/77726476706e69737468656265737421e3e44ed22931665b7f01c7a99c406d3635/sso/login?service=https://webvpn.nankai.edu.cn/login?cas_login=true',
+    'sec-ch-ua': '"Google Chrome";v="95","Chromium";v="95",";Not A Brand";v="99"',
+    'sec-ch-ua-mobile': '?0',
+    'sec-ch-ua-platform': "Windows",
+    'Sec-Fetch-Dest': 'document',
+    'Sec-Fetch-Mode': 'navigate',
+    'Sec-Fetch-Site': 'same-origin',
+    'Sec-Fetch-User': '?1',
+    'Upgrade-Insecure-Requests': '1',
+    'User - Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Safari/537.36',
+
+    }
+
+    cookie1 = {"Cookie":cookie}
+
+    response = requests.get(url=url,headers=headers,cookies=cookie1)
+    print(response.status_code)
+    print(response.text)
+'''
+
 def main():
-    # get_in()
-    # yuyue()
-    chaxun()
+
+    cookie = get_cookie()
+    # cookie1 = 'show_vpn=0;refresh=1;wengine_vpn_ticketwebvpn_nankai_edu_cn='+cookie
+    # cookie1 = 'show_vpn=0;refresh=1;wengine_vpn_ticketwebvpn_nankai_edu_cn=2303d166cb0d52d3'
+    # cookie2 = 'wengine_vpn_ticketwebvpn_nankai_edu_cn=5403e9a94bac2e32; refresh=1'
+    # cookie2 = 'wengine_vpn_ticketwebvpn_nankai_edu_cn=cf81b8780adfea61; refresh=1'
+
+
+    cookie2 = 'wengine_vpn_ticketwebvpn_nankai_edu_cn='+cookie+'; refresh=1'
+
+    print(cookie2)
+
+    time.sleep(5)
+
+
+    # yuyue(cookie2)
+
+    # time.sleep(5)
+    # get_in(cookie2)
+    # time.sleep(5)
+    # time.sleep(6)
+    chaxun(cookie2)
+    # check_cookie(cookie2)
+
+
+    time_data = get_time()
+
+    # print(get_time())
+
+    driver.quit()
+
+
 
 main()
 
