@@ -26,8 +26,40 @@ def qiandao():
 
     response = requests.post(url=url,headers=headers)
 
-    print(response.status_code)
-    print(response.text)
+    # print(response.status_code)
+    # print(response.text)
+    # print(type(eval(response.text)['success']))
+    i = eval(response.text)['success']
+    if i == 0:
+        print(f'今日已经签到过了，本次签到获取到{i}Mb')
+        send_telegram(f'今日已经签到过了，本次签到获取到{i}Mb')
+    else:
+        print(f'签到成功，本次签到获取到{i}Mb')
+        send_telegram(f'签到成功，本次签到获取到{i}Mb')
 
-qiandao()
+
+def send_telegram(text):
+    chat_id = '1203976293'
+    token = '5065693849:AAGTkzWOZPKCsAOnyiZox0-qkm8GbaCSx6I'
+    bot = telegram.Bot(token=token)
+    try:
+        bot.send_message(chat_id=chat_id, text=text)
+        print('telegram信息发送成功')
+    except:
+        print('信息发送失败')
+
+def main():
+    try:
+        qiandao()
+    except:
+        print('程序错误')
+        send_telegram('程序错误')
+
+if __name__ == '__main__':
+    main()
+
+
+
+
+
 
