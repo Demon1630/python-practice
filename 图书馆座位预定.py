@@ -17,16 +17,55 @@ from selenium.webdriver.common.action_chains import ActionChains
 # driver = webdriver.Chrome()
 
 
-options = webdriver.ChromeOptions()
-options.add_argument('--no-sandbox') # 解决DevToolsActivePort文件不存在的报错
-options.add_argument('window-size=1600x900') # 指定浏览器分辨率
-options.add_argument('--disable-gpu') # 谷歌文档提到需要加上这个属性来规避bug
-options.add_argument('--hide-scrollbars') # 隐藏滚动条, 应对一些特殊页面
-options.add_argument('blink-settings=imagesEnabled=false') # 不加载图片, 提升速度
-options.add_argument('--headless') # 浏览器不提供可视化页面. linux下如果系统不支持可视化不加这条会启动失败
+def send_wechat(title,text,detal_url):
 
-# driver = webdriver.Chrome(options=options)#,executable_path='./chromedriver')
-driver = webdriver.Chrome(chrome_options=options)#,executable_path='./chromedriver')
+    get_acs_token_url = 'https://qyapi.weixin.qq.com/cgi-bin/gettoken?corpid=ww428187fbdb9fd50f&corpsecret=po3lAng2YdZzaa67teFhmOxL34EuuWpffdiZlQeGaNk'
+
+    access = requests.get(url=get_acs_token_url)
+    access_token = eval(access.text)['access_token']
+    # print(type(eval(access_token.text)))
+    # print(access_token)
+    url = f'https://qyapi.weixin.qq.com/cgi-bin/message/send?access_token={access_token}'
+    # print(url)
+    headers = {
+        'User-Agent': UserAgent().random
+    }
+
+    key = {
+        "touser": "@all",
+        # "toparty": "PartyID1|PartyID2",
+        # "totag": "TagID1 | TagID2",
+        "msgtype": "textcard",
+        "agentid": 1000002,
+        # "text": '测试',
+        "textcard": {
+            "title": title,
+            "description": text,#"<div class=\"gray\">2016年9月26日</div> <div class=\"normal\">恭喜你抽中iPhone 7一台，领奖码：xxxx</div><div class=\"highlight\">请于2016年10月10日前联系行政同事领取</div>",
+            "url": detal_url,
+            "btntxt": "更多"
+        },
+        "safe": 0,
+        "enable_id_trans": 0,
+        "enable_duplicate_check": 0,
+        "duplicate_check_interval": 1800
+    }
+    res = requests.post(url=url,headers=headers,json=key)
+
+
+
+
+
+
+options = webdriver.ChromeOptions()
+# options.add_argument('--no-sandbox') # 解决DevToolsActivePort文件不存在的报错
+# options.add_argument('window-size=1600x900') # 指定浏览器分辨率
+# options.add_argument('--disable-gpu') # 谷歌文档提到需要加上这个属性来规避bug
+# options.add_argument('--hide-scrollbars') # 隐藏滚动条, 应对一些特殊页面
+# options.add_argument('blink-settings=imagesEnabled=false') # 不加载图片, 提升速度
+# options.add_argument('--headless') # 浏览器不提供可视化页面. linux下如果系统不支持可视化不加这条会启动失败
+
+driver = webdriver.Chrome(options=options)#,executable_path='./chromedriver')
+# driver = webdriver.Chrome(chrome_options=options)#,executable_path='./chromedriver')
 
 
 
@@ -240,6 +279,9 @@ def chaxun(cookie):
     print(response.status_code)
     print(response.text)
 
+    send_wechat('图书馆预约通知',response.text,'https://webvpn.nankai.edu.cn/https/77726476706e69737468656265737421fcfe4395247e6651700388a5d6502720c6dba7/clientweb/xcus/ic2/Default.aspx')
+
+
 '''
 def check_cookie(cookie):
 
@@ -295,6 +337,8 @@ def main():
     # time.sleep(5)
     # time.sleep(6)
     chaxun(cookie2)
+
+
     # check_cookie(cookie2)
 
 

@@ -18,10 +18,17 @@ def get_time():
 
 def send_telegram(text):
     chat_id = '1203976293'
-    token = '1870256785:AAGGYEIaDf9UBs6TBe91ZmxqNRqfMKnZXN4'
+    # token = '1870256785:AAGGYEIaDf9UBs6TBe91ZmxqNRqfMKnZXN4'
+    token = '1870256785:AAF_Lb6Xq4sN1mq5ra6_zHQdGGBetMj0hVc'
     bot = telegram.Bot(token=token)
 
-    bot.send_message(chat_id=chat_id, text=text)
+    try:
+        bot.send_message(chat_id=chat_id, text=text)
+        print('telegram信息发送成功')
+    except:
+        print('信息发送失败')
+
+    # bot.send_message(chat_id=chat_id, text=text)
 
 def send_wechat(title,text,detal_url):
 
@@ -72,42 +79,52 @@ def get_info():
     print(respons.status_code)
     # print(respons.text)
 
-    data = eval('['+ re.search('"servers": \[\n(.*?)\],',respons.text,re.S).group(1).replace('true','111').replace('false','000') + ']')   #转换成列表
-    # print(type(eval(data)))
+    if respons.status_code == 200:
+        data = eval('['+ re.search('"servers": \[\n(.*?)\],',respons.text,re.S).group(1).replace('true','111').replace('false','000') + ']')   #转换成列表
+        # print(type(eval(data)))
 
 
-    # print(data)
-    # print(len(data))
-    text = get_time() +'\n'
-    for i in data:
-        # print(i)
-        info = eval(str(i))   #获得内容字典
-        # print(type(info))
-        if info['online4'] == 111:
-            status = '在线'
-        else:
-            status = '不在线'
-        memory =  float(info["memory_used"])/float(info["memory_total"])*100
-        hdd = float(info["hdd_used"])/float(info["hdd_total"])*100
+        # print(data)
+        # print(len(data))
+        text = get_time() +'\n'
+        for i in data:
+            # print(i)
+            info = eval(str(i))   #获得内容字典
+            # print(type(info))
+            if info['online4'] == 111:
+                status = '在线'
 
-        text = text+f'主机: {info["name"]}  {status}, 在线时长：{info["uptime"]}  CPU：{info["cpu"]}%  内存：{int(memory)}%  硬盘：{int(hdd)}%' + '\n'
+                memory =  float(info["memory_used"])/float(info["memory_total"])*100
+                hdd = float(info["hdd_used"])/float(info["hdd_total"])*100
 
-        if hdd >80:
-            warm1 = f'警告 {info["name"]} 硬盘使用过高，超过80%'
-            send_wechat('主机监控',warm1,'https://www.demon1630.ga/')
-            send_telegram(warm1)
-            # print(warm1)
-        if memory >85:
-            warm2 = f'警告 {info["name"]} 内存使用过高，超过85%'
-            send_wechat('主机监控',warm2,'https://www.demon1630.ga/')
-            send_telegram(warm2)
-            # print(warm2)
+                text = text+f'主机: {info["name"]}  {status}, 在线时长：{info["uptime"]}  CPU：{info["cpu"]}%  内存：{int(memory)}%  硬盘：{int(hdd)}%' + '\n'
+
+            else:
+                status = '不在线'
+                memory = 0
+                hdd = 0
+
+                text = text + f'主机: {info["name"]}  {status}' + '\n'
+
+            if hdd >80:
+                warm1 = f'警告 {info["name"]} 硬盘使用过高，超过80%'
+                send_wechat('主机监控',warm1,'https://www.demon1630.ga/')
+                send_telegram(warm1)
+                # print(warm1)
+            if memory >85:
+                warm2 = f'警告 {info["name"]} 内存使用过高，超过85%'
+                send_wechat('主机监控',warm2,'https://www.demon1630.ga/')
+                send_telegram(warm2)
+                # print(warm2)
 
 
-        # print(f'主机: {info["name"]}  {status}, 在线时长：{info["uptime"]}  CPU：{info["cpu"]}%  内存：{int(memory)}%  硬盘：{int(hdd)}%')
+            # print(f'主机: {info["name"]}  {status}, 在线时长：{info["uptime"]}  CPU：{info["cpu"]}%  内存：{int(memory)}%  硬盘：{int(hdd)}%')
 
-    # print(text)
-    return text
+        print(text)
+        return text
+    else:
+        print('查询错误')
+        return '查询错误'
 
 def main():
     try:

@@ -6,15 +6,31 @@ from selenium.webdriver.common.action_chains import ActionChains
 # driver = webdriver.Chrome()
 
 
+
+
 options = webdriver.ChromeOptions()
 options.add_argument('--no-sandbox') # 解决DevToolsActivePort文件不存在的报错
 options.add_argument('window-size=1600x900') # 指定浏览器分辨率
 options.add_argument('--disable-gpu') # 谷歌文档提到需要加上这个属性来规避bug
 options.add_argument('--hide-scrollbars') # 隐藏滚动条, 应对一些特殊页面
 options.add_argument('blink-settings=imagesEnabled=false') # 不加载图片, 提升速度
-options.add_argument('--headless') # 浏览器不提供可视化页面. linux下如果系统不支持可视化不加这条会启动失败
+# options.add_argument('--headless') # 浏览器不提供可视化页面. linux下如果系统不支持可视化不加这条会启动失败
+
+# from selenium.webdriver.chrome.options import Options
+#
+# # 实例化一个Options
+# chrome_options = Options()  # 用于定义下载不弹窗和默认下载地址（默认下载地址还要再后面的commands里启动，默认是不开启的）
+# prefs = {"download.default_directory": "E:\download", "download.prompt_for_download": False, }
+# chrome_options.add_experimental_option("prefs", prefs)
+# # 无头模式（就是不打开浏览器）
+# # chrome_options.add_argument("--headless")
+# browser = webdriver.Chrome(chrome_options=chrome_options)
+# browser.command_executor._commands["send_command"] = ("POST", '/session/$sessionId/chromium/send_command')
+# params = {'cmd': 'Page.setDownloadBehavior', 'params': {'behavior': 'allow', 'downloadPath': "E:\download"}}
+# command_result = browser.execute("send_command", params)
 
 driver = webdriver.Chrome(options=options)#,executable_path='./chromedriver')
+# driver = webdriver.Chrome(options=chrome_options)#,executable_path='./chromedriver')
 
 
 

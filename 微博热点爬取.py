@@ -9,7 +9,7 @@ import os
 from openpyxl import workbook  # 写入Excel表所用
 from openpyxl import load_workbook  # 读取Excel表所用
 import openpyxl
-import wordcloud
+# import wordcloud
 import jieba  #分词
 
 
